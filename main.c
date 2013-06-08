@@ -7,6 +7,7 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <dirent.h>
+#include <assert.h>
 
 static const char *hello_str = "Hello World!\n";
 static const char *hello_path = "/hello";
@@ -36,7 +37,6 @@ static int qlive_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 
     DIR *dir;
     recreateBuf(path);
-    debug(buffer);
     if ((dir = opendir(buffer)) == NULL)
         return -ENOENT;
 
@@ -66,12 +66,16 @@ static int qlive_read(const char *path, char *buf, size_t size, off_t offset,
               struct fuse_file_info *fi)
 {
     (void) fi;
+    printf("%d %d\n", offset + 1, size);
+    fflush(stdout);
+    int success;
+    scanf("%d", &success);
+    assert(success == 1);
     recreateBuf(path);
     FILE *f = fopen(buffer, "rb");
     if (f == NULL)
         return -EACCES;
 
-    char *by = malloc(1000);
     fseek(f, offset, SEEK_SET);
     int res = fread(buf, 1, size, f);
     fclose(f);
@@ -80,7 +84,6 @@ static int qlive_read(const char *path, char *buf, size_t size, off_t offset,
 }
 
 void qlive_init(char *path) {
-    debug(path);
     mountPoint = path;
     buffer = malloc(1000);
     for (mountLen = 0; mountPoint[mountLen] != 0; mountLen++)
