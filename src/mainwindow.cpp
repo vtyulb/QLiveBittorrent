@@ -50,7 +50,7 @@ void MainWindow::updateInform() {
     model->setColumnCount(6);
     model->setRowCount(v.size());
     model->setHorizontalHeaderLabels(list);
-    for (int i = 0; i < v.size(); i++) {
+    for (unsigned int i = 0; i < v.size(); i++) {
         libtorrent::torrent_status s = v[i].status();
         libtorrent::torrent_info inf = v[i].get_torrent_info();
         model->setItem(i, 0, new QStandardItem(QString::fromStdString(v[i].name())));

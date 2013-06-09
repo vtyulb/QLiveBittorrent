@@ -9,8 +9,6 @@
 #include <dirent.h>
 #include <assert.h>
 
-static const char *hello_str = "Hello World!\n";
-static const char *hello_path = "/hello";
 static char *mountPoint;
 static int mountLen;
 static char *buffer;
@@ -66,7 +64,7 @@ static int qlive_read(const char *path, char *buf, size_t size, off_t offset,
               struct fuse_file_info *fi)
 {
     (void) fi;
-    printf("%d %d\n", offset + 1, size);
+    printf("%s\n%d\n%d\n", path, offset + 1, size);
     fflush(stdout);
     int success;
     scanf("%d", &success);

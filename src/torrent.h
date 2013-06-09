@@ -5,6 +5,7 @@
 #include <QMap>
 #include <QDebug>
 #include <QProcess>
+#include <QDir>
 #include <libtorrent/torrent_handle.hpp>
 
 using libtorrent::file_storage;
@@ -20,7 +21,8 @@ private:
     QProcess *mountProcess;
 signals:
     
-public slots:
+private slots:
+    void needPiece();
     
 };
 
