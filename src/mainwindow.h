@@ -24,6 +24,7 @@ namespace Ui {
 }
 
 const QString mountPath = "/home/vlad/mount/";
+const QString savePath = "/home/vlad/test/";
 
 class MainWindow : public QMainWindow
 {

@@ -11,11 +11,11 @@ Torrent::Torrent(const QString &path, const QString &mount, const libtorrent::to
         qDebug() << "added path: " << QString::fromStdString(inform.files().at(i).path);
     }
 
-    mount = new QProcess;
+    mountProcess = new QProcess;
     QStringList params;
     params << "-s"; //single-threaded
     params << "-f"; //force don't know what
     params << mount; //where mounting
     params << path; //what mounting
-    mount->start("driver", params);
+    mountProcess->start("driver", params);
 }
