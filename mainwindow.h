@@ -5,6 +5,7 @@
 #include <QFileDialog>
 #include <QTimer>
 #include <QDebug>
+#include <QStandardItemModel>
 
 #include <iostream>
 #include <fstream>
@@ -14,9 +15,8 @@
 #include "libtorrent/bencode.hpp"
 #include "libtorrent/torrent_info.hpp"
 #include "libtorrent/lazy_entry.hpp"
-#include <libtorrent/session.hpp>
-#include <boost/filesystem/operations.hpp>
-
+#include "libtorrent/session.hpp"
+#include "boost/filesystem/operations.hpp"
 
 namespace Ui {
     class MainWindow;
@@ -38,6 +38,7 @@ private:
 private slots:
     void addTorrent();
     void showInform();
+    void updateInform();
 };
 
 #endif // MAINWINDOW_H
