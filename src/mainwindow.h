@@ -6,6 +6,7 @@
 #include <QTimer>
 #include <QDebug>
 #include <QStandardItemModel>
+#include <torrent.h>
 
 #include <iostream>
 #include <fstream>
@@ -22,6 +23,8 @@ namespace Ui {
     class MainWindow;
 }
 
+const QString mountPath = "/home/vlad/mount/";
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -37,7 +40,6 @@ private:
     void initSession();
 private slots:
     void addTorrent();
-    void showInform();
     void updateInform();
 };
 

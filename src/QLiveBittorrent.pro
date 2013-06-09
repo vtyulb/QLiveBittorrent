@@ -14,9 +14,11 @@ TEMPLATE = app
 LIBS += -lboost_system -ltorrent-rasterbar
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    torrent.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    torrent.h
 
 FORMS    += mainwindow.ui
 

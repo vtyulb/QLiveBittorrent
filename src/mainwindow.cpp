@@ -14,7 +14,6 @@ MainWindow::MainWindow(QWidget *parent) :
     updateInform();
     QTimer *timer = new QTimer;
     timer->setInterval(1000);
-    QObject::connect(timer, SIGNAL(timeout()), this, SLOT(showInform()));
     QObject::connect(timer, SIGNAL(timeout()), this, SLOT(updateInform()));
     timer->start();
 }
@@ -26,6 +25,8 @@ MainWindow::~MainWindow()
 
 void MainWindow::initSession() {
     session = new libtorrent::session;
+//    libtorrent::session_settings settings = session->settings();
+//    settings.`
     session->listen_on(std::make_pair(6881, 6889));
 }
 
@@ -34,18 +35,10 @@ void MainWindow::addTorrent() {
                                                    QString("*.torrent"));
     libtorrent::add_torrent_params p;
     p.save_path = "/home/vlad/test/";
-    p.ti = new libtorrent::torrent_info(torrent.toStdString());
-    session->add_torrent(p);
-}
+    libtorrent::torrent_info *inf = new libtorrent::torrent_info(torrent.toStdString());
+    p.ti = inf;
 
-void MainWindow::showInform() {
-    std::vector<libtorrent::torrent_handle> v = session->get_torrents();
-    qDebug() << v.size();
-    for (int i = 0; i < v.size(); i++) {
-        libtorrent::torrent_status s = v[i].status();
-        qDebug() << i << s.download_rate << s.total_download;
-    }
-    qDebug() << "------------------------------";
+    new Torrent(mountPath + QString::fromStdString(inf->name()), session->add_torrent(p), this);
 }
 
 void MainWindow::updateInform() {
