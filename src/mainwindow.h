@@ -23,6 +23,11 @@ namespace Ui {
     class MainWindow;
 }
 
+using libtorrent::torrent_info;
+using libtorrent::torrent_handle;
+using libtorrent::torrent_status;
+using libtorrent::add_torrent_params;
+
 const QString mountPath = "/home/vlad/mount/";
 const QString savePath = "/home/vlad/test/";
 

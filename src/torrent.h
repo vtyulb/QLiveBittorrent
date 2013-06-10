@@ -10,18 +10,25 @@
 #include <libtorrent/torrent_handle.hpp>
 
 using libtorrent::file_storage;
+using libtorrent::torrent_info;
+using libtorrent::torrent_handle;
+using libtorrent::peer_request;
 typedef file_storage::iterator file_iterator;
 
 class Torrent : public QObject
 {
     Q_OBJECT
 public:
-    explicit Torrent(const QString &path, const QString &mount, const libtorrent::torrent_handle &handle, QObject *parent = 0);
+    explicit Torrent(const QString &path, const QString &mount, torrent_handle handle, QObject *parent = 0);
     QMap<QString, int> m;
+    ~Torrent();
 private:
     QProcess *mountProcess;
-    int readInt(const QString &s);
+    long long readInt(const QString &s);
+    void umount();
+    torrent_handle *torrent;
     QString name;
+    QStringList umountList;
 signals:
     
 private slots:

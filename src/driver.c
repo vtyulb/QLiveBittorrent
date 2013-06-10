@@ -64,7 +64,7 @@ static int qlive_read(const char *path, char *buf, size_t size, off_t offset,
               struct fuse_file_info *fi)
 {
     (void) fi;
-    printf("%s\n%d\n%d\n", path, offset + 1, size);
+    printf("%s\n%lld\n%lld\n", path, offset, size);
     fflush(stdout);
     int success;
     scanf("%d", &success);

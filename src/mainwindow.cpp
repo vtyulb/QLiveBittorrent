@@ -33,16 +33,16 @@ void MainWindow::initSession() {
 void MainWindow::addTorrent() {
     QString torrent = QFileDialog::getOpenFileName(this, QString(), QString(),
                                                    QString("*.torrent"));
-    libtorrent::add_torrent_params p;
+    add_torrent_params p;
     p.save_path = savePath.toStdString();
-    libtorrent::torrent_info *inf = new libtorrent::torrent_info(torrent.toStdString());
+    torrent_info *inf = new libtorrent::torrent_info(torrent.toStdString());
     p.ti = inf;
 
     new Torrent(savePath + QString::fromStdString(inf->name()), mountPath + QString::fromStdString(inf->name()), session->add_torrent(p), this);
 }
 
 void MainWindow::updateInform() {
-    std::vector<libtorrent::torrent_handle> v = session->get_torrents();
+    std::vector<torrent_handle> v = session->get_torrents();
 
     QStringList list;
     list << "Name" << "Size" << "Downloaded" << "Download rate" << "Seeds" << "Connected";
@@ -51,8 +51,8 @@ void MainWindow::updateInform() {
     model->setRowCount(v.size());
     model->setHorizontalHeaderLabels(list);
     for (unsigned int i = 0; i < v.size(); i++) {
-        libtorrent::torrent_status s = v[i].status();
-        libtorrent::torrent_info inf = v[i].get_torrent_info();
+        torrent_status s = v[i].status();
+        torrent_info inf = v[i].get_torrent_info();
         model->setItem(i, 0, new QStandardItem(QString::fromStdString(v[i].name())));
         model->setItem(i, 1, new QStandardItem(QString::number(inf.total_size())));
         model->setItem(i, 2, new QStandardItem(QString::number(s.total_download)));
