@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <QProcess>
 #include <QDir>
+#include <QEventLoop>
 #include <libtorrent/torrent_handle.hpp>
 
 using libtorrent::file_storage;
@@ -19,6 +20,8 @@ public:
     QMap<QString, int> m;
 private:
     QProcess *mountProcess;
+    int readInt(const QString &s);
+    QString name;
 signals:
     
 private slots:

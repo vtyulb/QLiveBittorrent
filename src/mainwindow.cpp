@@ -38,7 +38,7 @@ void MainWindow::addTorrent() {
     libtorrent::torrent_info *inf = new libtorrent::torrent_info(torrent.toStdString());
     p.ti = inf;
 
-    new Torrent(savePath, mountPath + QString::fromStdString(inf->name()), session->add_torrent(p), this);
+    new Torrent(savePath + QString::fromStdString(inf->name()), mountPath + QString::fromStdString(inf->name()), session->add_torrent(p), this);
 }
 
 void MainWindow::updateInform() {
