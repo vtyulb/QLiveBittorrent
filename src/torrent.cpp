@@ -7,7 +7,9 @@ Torrent::Torrent(const QString &path, const QString &mount, torrent_handle handl
     QDir tmp;
     tmp.mkdir(mount);
     torrent = new torrent_handle(handle);
-    torrent->set_sequential_download(true);
+//    torrent->set_sequential_download(true);
+    torrent->set_download_limit(200000);
+    torrent->set_max_connections(10);
 
     name = QString::fromStdString(handle.name());
     qDebug() << tmp.mkpath(mount);
@@ -54,12 +56,15 @@ void Torrent::needPiece() {
     peer_request req = torrent->get_torrent_info().map_file(id, offset, size);
     std::vector<int> priorities = torrent->piece_priorities();
     for (int i = 0; i < priorities.size(); i++)
-        if (i >= req.piece)
-            priorities[i] = 7;
-        else
-            priorities[i] = 1;
+        if (priorities[i] != 7)
+            if ((i >= req.piece) && (i <= req.piece + 5))
+                priorities[i] = 7;
+            else
+                priorities[i] = 1;
 
-    int start = req.start;
+    torrent->prioritize_pieces(priorities);
+
+    int start = req.piece;
     int end = min(start + req.length / torrent->get_torrent_info().piece_length() + 1,
                   torrent->get_torrent_info().num_pieces() - 1);
 
@@ -76,8 +81,15 @@ long long Torrent::readInt(const QString &s) {
 }
 
 void Torrent::waitForDownload(int start, int end) {
-    while (!checkForDownload(start, end))
-        sleep(10);
+    while (!checkForDownload(start, end)) {
+        std::vector<partial_piece_info> queue;
+        torrent->get_download_queue(queue);
+        for (int i = 0; i < queue.size(); i++) {
+            printf("%d %d\n", queue[i].piece_index, queue[i].piece_state);
+            fflush(stdout);
+        }
+        sleep(100);
+    }
 }
 
 void Torrent::sleep(int ms) {

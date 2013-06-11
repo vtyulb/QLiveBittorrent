@@ -14,6 +14,7 @@ using libtorrent::file_storage;
 using libtorrent::torrent_info;
 using libtorrent::torrent_handle;
 using libtorrent::peer_request;
+using libtorrent::partial_piece_info;
 using std::min;
 typedef file_storage::iterator file_iterator;
 
