@@ -9,6 +9,8 @@
 #include <QEventLoop>
 #include <QTimer>
 #include <libtorrent/torrent_handle.hpp>
+#include <libtorrent/ip_filter.hpp>
+#include <libtorrent/peer_info.hpp>
 
 using libtorrent::file_storage;
 using libtorrent::torrent_info;
@@ -42,7 +44,7 @@ signals:
 private slots:
     void needPiece();
     void staticRecall();
-    
+    void lesserPeers();
 };
 
 #endif // TORRENT_H
