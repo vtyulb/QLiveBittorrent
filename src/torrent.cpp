@@ -31,6 +31,12 @@ Torrent::Torrent(const QString &path, const QString &mount, torrent_handle handl
     params << path;
     qDebug() << params;
     mountProcess->start("./../driver", params);
+    lastAsk = 0;
+
+    staticReprioritize = new QTimer;
+    staticReprioritize->setInterval(100);
+    QObject::connect(staticReprioritize, SIGNAL(timeout()), this, SLOT(staticRecall()));
+    staticReprioritize->start();
 }
 
 void Torrent::umount() {
@@ -55,18 +61,22 @@ void Torrent::needPiece() {
 
     peer_request req = torrent->get_torrent_info().map_file(id, offset, size);
     std::vector<int> priorities = torrent->piece_priorities();
+
+    int start = req.piece;
+    int end = min(start + req.length / torrent->get_torrent_info().piece_length() + 1,
+                  torrent->get_torrent_info().num_pieces() - 1);
+
+    lastAsk = start;
+
     for (int i = 0; i < priorities.size(); i++)
         if (priorities[i] != 7)
-            if ((i >= req.piece) && (i <= req.piece + 5))
+            if ((i >= start) && (i <= end))
                 priorities[i] = 7;
             else
                 priorities[i] = 1;
 
     torrent->prioritize_pieces(priorities);
 
-    int start = req.piece;
-    int end = min(start + req.length / torrent->get_torrent_info().piece_length() + 1,
-                  torrent->get_torrent_info().num_pieces() - 1);
 
     qDebug() << "waiting for piece";
     qDebug() << start << end;
@@ -105,4 +115,18 @@ bool Torrent::checkForDownload(int start, int end) {
             return false;
 
     return true;
+}
+
+void Torrent::staticRecall() {
+    int i;
+    libtorrent::bitfield bit = torrent->status().pieces;
+    for (i = lastAsk; i < torrent->get_torrent_info().num_pieces(); i++)
+        if (!bit[i])
+            break;
+
+    std::vector<int> p = torrent->piece_priorities();
+    for (int j = i; j < i + 2; j++)
+        p[j] = 7;
+
+    torrent->prioritize_pieces(p);
 }

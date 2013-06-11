@@ -33,12 +33,15 @@ private:
     void sleep(int ms);
     void umount();
     torrent_handle *torrent;
+    int lastAsk;
     QString name;
     QStringList umountList;
+    QTimer *staticReprioritize;
 signals:
     
 private slots:
     void needPiece();
+    void staticRecall();
     
 };
 
