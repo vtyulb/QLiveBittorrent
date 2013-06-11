@@ -5,7 +5,9 @@ Torrent::Torrent(const QString &path, const QString &mount, torrent_handle handl
 {
     qDebug() << mount << path;
     QDir tmp;
+    tmp.mkdir(mount);
     torrent = new torrent_handle(handle);
+    torrent->set_sequential_download(true);
 
     name = QString::fromStdString(handle.name());
     qDebug() << tmp.mkpath(mount);
@@ -44,18 +46,51 @@ void Torrent::needPiece() {
     char string[1000];
     mountProcess->readLine(string, 999);
     QString idString = QString(string);
-    idString = "/" + name + idString.left(idString.length() - 1);
+    idString = idString.left(idString.length() - 1);
     int id = m[idString];
     long long offset = readInt(mountProcess->readLine());
     long long size = readInt(mountProcess->readLine());
 
     peer_request req = torrent->get_torrent_info().map_file(id, offset, size);
+    std::vector<int> priorities = torrent->piece_priorities();
+    for (int i = 0; i < priorities.size(); i++)
+        if (i >= req.piece)
+            priorities[i] = 7;
+        else
+            priorities[i] = 1;
 
+    int start = req.start;
+    int end = min(start + req.length / torrent->get_torrent_info().piece_length() + 1,
+                  torrent->get_torrent_info().num_pieces() - 1);
+
+    qDebug() << "waiting for piece";
+    qDebug() << start << end;
+    waitForDownload(start, end);
+    qDebug() << "piece gotten";
 
     mountProcess->write("1\n");
-    qDebug() << id << offset << size;
 }
 
 long long Torrent::readInt(const QString &s) {
     return s.left(s.length() - 1).toLongLong();
+}
+
+void Torrent::waitForDownload(int start, int end) {
+    while (!checkForDownload(start, end))
+        sleep(10);
+}
+
+void Torrent::sleep(int ms) {
+    QEventLoop *loop = new QEventLoop;
+    QTimer::singleShot(ms, loop, SLOT(quit()));
+    loop->exec();
+}
+
+bool Torrent::checkForDownload(int start, int end) {
+    libtorrent::bitfield bit = torrent->status().pieces;
+    for (int i = start; i <= end; i++)
+        if (!bit[i])
+            return false;
+
+    return true;
 }

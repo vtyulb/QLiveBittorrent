@@ -34,9 +34,10 @@ void MainWindow::addTorrent() {
     QString torrent = QFileDialog::getOpenFileName(this, QString(), QString(),
                                                    QString("*.torrent"));
     add_torrent_params p;
-    p.save_path = savePath.toStdString();
     torrent_info *inf = new libtorrent::torrent_info(torrent.toStdString());
+    p.save_path = (savePath + QString::fromStdString(inf->name()) + "/").toStdString();
     p.ti = inf;
+    p.storage_mode = libtorrent::storage_mode_allocate;
 
     new Torrent(savePath + QString::fromStdString(inf->name()), mountPath + QString::fromStdString(inf->name()), session->add_torrent(p), this);
 }
