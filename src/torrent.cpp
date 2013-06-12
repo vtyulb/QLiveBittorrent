@@ -32,6 +32,9 @@ Torrent::Torrent(const QString &path, const QString &mount, torrent_handle handl
     qDebug() << params;
     mountProcess->start("./../driver", params);
     lastAsk = 0;
+    priorities = new bool[torrent->get_torrent_info().num_pieces()];
+    for (int i = 0; i < torrent->get_torrent_info().num_pieces(); i++)
+        priorities[i] = 0;
 
     staticReprioritize = new QTimer;
     staticReprioritize->setInterval(100);
@@ -68,8 +71,15 @@ void Torrent::needPiece() {
 
     lastAsk = start;
 
-    for (int i = start; i <= end; i++)
+    for (int i = 0; i < torrent->get_torrent_info().num_pieces(); i++) {
+        torrent->reset_piece_deadline(i);
+        priorities[i] = 0;
+    }
+
+    for (int i = start; i <= end; i++) {
         torrent->set_piece_deadline(i, 100);
+        priorities[i] = 1;
+    }
 
 
     qDebug() << "waiting for piece";
@@ -87,15 +97,6 @@ long long Torrent::readInt(const QString &s) {
 void Torrent::waitForDownload(int start, int end) {
     while (!checkForDownload(start, end)) {
         qDebug() << "-------------- waiting for " << start << end;
-        std::vector<partial_piece_info> queue;
-        torrent->get_download_queue(queue);
-        for (int i = 0; i < queue.size(); i++) {
-            if ((queue[i].piece_state == 1) || (queue[i].piece_state == 2)) {
-                torrent->set_max_connections(2);
-                torrent->set_max_connections(10);
-            }
-            qDebug() << queue[i].piece_index << queue[i].piece_state;
-        }
         sleep(100);
     }
 }
@@ -124,6 +125,16 @@ void Torrent::staticRecall() {
 
     for (int j = i; j < i + 4; j++)
         torrent->set_piece_deadline(j, 1000);
+
+    std::vector<partial_piece_info> queue;
+    torrent->get_download_queue(queue);
+    for (int i = 0; i < queue.size(); i++) {
+        if (((queue[i].piece_state == 1) || (queue[i].piece_state == 2)) && (priorities[i])) {
+            torrent->set_max_connections(2);
+            torrent->set_max_connections(10);
+        }
+        qDebug() << queue[i].piece_index << queue[i].piece_state;
+    }
 }
 
 void Torrent::lesserPeers() {

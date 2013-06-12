@@ -36,6 +36,7 @@ private:
     void umount();
     torrent_handle *torrent;
     int lastAsk;
+    bool *priorities;
     QString name;
     QStringList umountList;
     QTimer *staticReprioritize;
