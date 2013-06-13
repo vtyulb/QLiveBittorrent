@@ -25,9 +25,12 @@ MainWindow::~MainWindow()
 
 void MainWindow::initSession() {
     session = new libtorrent::session;
-//    libtorrent::session_settings settings = session->settings();
-//    settings.`
+    libtorrent::session_settings settings = session->settings();
+    settings.peer_turnover_interval = 20;
+    settings.max_allowed_in_request_queue = 4;
+    settings.seed_choking_algorithm = settings.fastest_upload;
     session->listen_on(std::make_pair(6881, 6889));
+    session->set_settings(settings);
 }
 
 void MainWindow::addTorrent() {

@@ -7,9 +7,7 @@ Torrent::Torrent(const QString &path, const QString &mount, torrent_handle handl
     QDir tmp;
     tmp.mkdir(mount);
     torrent = new torrent_handle(handle);
-//    torrent->set_sequential_download(true);
-//    torrent->set_download_limit(200000);
-    torrent->set_max_connections(10);
+    torrent->set_max_connections(15);
 
     name = QString::fromStdString(handle.name());
     qDebug() << tmp.mkpath(mount);
@@ -37,7 +35,7 @@ Torrent::Torrent(const QString &path, const QString &mount, torrent_handle handl
         priorities[i] = 0;
 
     staticReprioritize = new QTimer;
-    staticReprioritize->setInterval(100);
+    staticReprioritize->setInterval(500);
     QObject::connect(staticReprioritize, SIGNAL(timeout()), this, SLOT(staticRecall()));
     QTimer::singleShot(120000, this, SLOT(lesserPeers()));
     staticReprioritize->start();
@@ -74,6 +72,8 @@ void Torrent::needPiece() {
     for (int i = 0; i < torrent->get_torrent_info().num_pieces(); i++) {
         torrent->reset_piece_deadline(i);
         priorities[i] = 0;
+        if (i == start - 1)
+            i = end;
     }
 
     for (int i = start; i <= end; i++) {
@@ -82,7 +82,7 @@ void Torrent::needPiece() {
     }
 
 
-    qDebug() << "waiting for piece";
+    qDebug() << "waiting for piece in range" << torrent->get_torrent_info().num_pieces();
     qDebug() << start << end;
     waitForDownload(start, end);
     qDebug() << "piece gotten";
@@ -95,10 +95,8 @@ long long Torrent::readInt(const QString &s) {
 }
 
 void Torrent::waitForDownload(int start, int end) {
-    while (!checkForDownload(start, end)) {
-        qDebug() << "-------------- waiting for " << start << end;
+    while (!checkForDownload(start, end))
         sleep(100);
-    }
 }
 
 void Torrent::sleep(int ms) {
@@ -123,20 +121,13 @@ void Torrent::staticRecall() {
         if (!bit[i])
             break;
 
-    for (int j = i; j < i + 4; j++)
-        torrent->set_piece_deadline(j, 1000);
-
-    std::vector<partial_piece_info> queue;
-    torrent->get_download_queue(queue);
-    for (int i = 0; i < queue.size(); i++) {
-        if (((queue[i].piece_state == 1) || (queue[i].piece_state == 2)) && (priorities[i])) {
-            torrent->set_max_connections(2);
-            torrent->set_max_connections(10);
-        }
-        qDebug() << queue[i].piece_index << queue[i].piece_state;
+    for (int j = i; j < i + 3; j++) {
+        torrent->set_piece_deadline(j, 500);
+        priorities[j] = 1;
     }
 }
 
 void Torrent::lesserPeers() {
-    torrent->set_max_connections(5);
+    qDebug() << "lesser!";
+    torrent->set_max_connections(3);
 }
