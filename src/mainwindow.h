@@ -6,7 +6,11 @@
 #include <QTimer>
 #include <QDebug>
 #include <QStandardItemModel>
+#include <QSettings>
+#include <QPainter>
+
 #include <torrent.h>
+#include <generateimage.h>
 
 #include <iostream>
 #include <fstream>
@@ -30,6 +34,7 @@ using libtorrent::add_torrent_params;
 
 const QString mountPath = "/home/vlad/mount/";
 const QString savePath = "/home/vlad/test/";
+const QString settingsFile = "/home/vlad/.qlivebittorrent/qlivebittorrent.ini";
 
 class MainWindow : public QMainWindow
 {
@@ -44,6 +49,9 @@ private:
     libtorrent::session *session;
 
     void initSession();
+    void initTableWidgetHeader();
+    void saveSettings();
+    void loadSettings();
 private slots:
     void addTorrent();
     void updateInform();

@@ -15,10 +15,12 @@ LIBS += -lboost_system -ltorrent-rasterbar
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    torrent.cpp
+    torrent.cpp \
+    generateimage.cpp
 
 HEADERS  += mainwindow.h \
-    torrent.h
+    torrent.h \
+    generateimage.h
 
 FORMS    += mainwindow.ui
 
