@@ -16,13 +16,18 @@ LIBS += -lboost_system -ltorrent-rasterbar
 SOURCES += main.cpp\
         mainwindow.cpp \
     torrent.cpp \
-    generateimage.cpp
+    generateimage.cpp \
+    torrentdialog.cpp \
+    getfolderdialog.cpp
 
 HEADERS  += mainwindow.h \
     torrent.h \
-    generateimage.h
+    generateimage.h \
+    torrentdialog.h \
+    getfolderdialog.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    torrentdialog.ui
 
 PKGCONFIG += libtorrent-rasterbar
 

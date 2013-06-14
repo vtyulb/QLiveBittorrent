@@ -9,6 +9,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QObject::connect(ui->actionExit, SIGNAL(triggered()), this, SLOT(close()));
     QObject::connect(ui->actionAdd_torrent, SIGNAL(triggered()), this, SLOT(addTorrent()));
+    QObject::connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(showAbout()));
+    QObject::connect(ui->actionAbout_Qt, SIGNAL(triggered()), this, SLOT(showAboutQt()));
 
     initSession();
     initTableWidgetHeader();
@@ -39,13 +41,23 @@ void MainWindow::initSession() {
 void MainWindow::addTorrent() {
     QString torrent = QFileDialog::getOpenFileName(this, QString(), QString(),
                                                    QString("*.torrent"));
+    TorrentDialog *dialog = new TorrentDialog(torrent, this);
+    dialog->show();
+    QObject::connect(dialog, SIGNAL(success(QString,QString,QString)), this, SLOT(realAddTorrent(QString, QString, QString)));
+}
+
+void MainWindow::realAddTorrent(QString torrentFile, QString torrentPath, QString mountPath) {
+    if (torrentPath[torrentPath.length() - 1] != QChar('/'))
+        torrentPath += "/";
+    if (mountPath[mountPath.length() - 1] != QChar('/'))
+        mountPath += "/";
     add_torrent_params p;
-    torrent_info *inf = new libtorrent::torrent_info(torrent.toStdString());
-    p.save_path = (savePath + QString::fromStdString(inf->name()) + "/").toStdString();
+    torrent_info *inf = new libtorrent::torrent_info(torrentFile.toStdString());
+    p.save_path = (torrentPath + QString::fromStdString(inf->name()) + "/").toStdString();
     p.ti = inf;
     p.storage_mode = libtorrent::storage_mode_allocate;
 
-    new Torrent(savePath + QString::fromStdString(inf->name()), mountPath + QString::fromStdString(inf->name()), session->add_torrent(p), this);
+    new Torrent(torrentPath + QString::fromStdString(inf->name()), mountPath + QString::fromStdString(inf->name()), session->add_torrent(p), this);
 }
 
 void MainWindow::initTableWidgetHeader() {
@@ -82,4 +94,12 @@ void MainWindow::saveSettings() {
 //    session->save_state(e);
 //    s.setValue("session", QVariant(e.string()));
 
+}
+
+void MainWindow::showAbout() {
+    QMessageBox::about(this, QString("About QLiveBittorrent"), QString("QLiveBittorrent - bittorrent client.\nWritten by Vladislav Tyulbashev.\n<vladislav.tyulbashev@yandex.ru>"));
+}
+
+void MainWindow::showAboutQt() {
+    QMessageBox::aboutQt(this);
 }

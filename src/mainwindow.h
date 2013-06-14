@@ -8,9 +8,11 @@
 #include <QStandardItemModel>
 #include <QSettings>
 #include <QPainter>
+#include <QMessageBox>
 
 #include <torrent.h>
 #include <generateimage.h>
+#include <torrentdialog.h>
 
 #include <iostream>
 #include <fstream>
@@ -32,8 +34,6 @@ using libtorrent::torrent_handle;
 using libtorrent::torrent_status;
 using libtorrent::add_torrent_params;
 
-const QString mountPath = "/home/vlad/mount/";
-const QString savePath = "/home/vlad/test/";
 const QString settingsFile = "/home/vlad/.qlivebittorrent/qlivebittorrent.ini";
 
 class MainWindow : public QMainWindow
@@ -54,7 +54,10 @@ private:
     void loadSettings();
 private slots:
     void addTorrent();
+    void realAddTorrent(QString torrentFile, QString torrentPath, QString mountPath);
     void updateInform();
+    void showAbout();
+    void showAboutQt();
 };
 
 #endif // MAINWINDOW_H
