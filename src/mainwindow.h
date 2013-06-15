@@ -5,10 +5,12 @@
 #include <QFileDialog>
 #include <QTimer>
 #include <QDebug>
+#include <QDir>
 #include <QStandardItemModel>
 #include <QSettings>
 #include <QPainter>
 #include <QMessageBox>
+#include <QByteArray>
 
 #include <torrent.h>
 #include <generateimage.h>
@@ -34,7 +36,9 @@ using libtorrent::torrent_handle;
 using libtorrent::torrent_status;
 using libtorrent::add_torrent_params;
 
-const QString settingsFile = "/home/vlad/.qlivebittorrent/qlivebittorrent.ini";
+Q_DECLARE_METATYPE(libtorrent::entry)
+
+const QString settingsFile = QDir::homePath() + "/.qlivebittorrent/qlivebittorrent.ini";
 
 class MainWindow : public QMainWindow
 {

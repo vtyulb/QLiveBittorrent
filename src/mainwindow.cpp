@@ -13,6 +13,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->actionAbout_Qt, SIGNAL(triggered()), this, SLOT(showAboutQt()));
 
     initSession();
+    loadSettings();
     initTableWidgetHeader();
     updateInform();
     QTimer *timer = new QTimer;
@@ -30,7 +31,6 @@ MainWindow::~MainWindow()
 void MainWindow::initSession() {
     session = new libtorrent::session;
     libtorrent::session_settings settings = session->settings();
-    settings.peer_turnover_interval = 20;
     settings.max_allowed_in_request_queue = 4;
     settings.seed_choking_algorithm = settings.fastest_upload;
     settings.choking_algorithm = settings.bittyrant_choker;
@@ -89,11 +89,35 @@ void MainWindow::updateInform() {
 }
 
 void MainWindow::saveSettings() {
-//    QSettings s(settingsFile, QSettings::IniFormat);
-//    libtorrent::entry e;
-//    session->save_state(e);
-//    s.setValue("session", QVariant(e.string()));
+    QSettings s(settingsFile, QSettings::IniFormat);
+    std::vector<torrent_handle> torrents = session->get_torrents();
+    for (int i = 0; i < torrents.size(); i++)
+        torrents[i].save_resume_data();
+    Torrent::sleep(10000);
+    libtorrent::entry e;
+    session->save_state(e);
+    //this code is copy-pasted from qbittorrent :-)
+    std::vector<char> out;
+    bencode(back_inserter(out), e);
+    QByteArray ar;
+    ar.resize(out.size());
+    for (int i = 0; i < out.size(); i++)
+        ar[i] = out[i];
 
+    s.setValue("session", QVariant(ar));
+}
+
+void MainWindow::loadSettings() {
+    QSettings s(settingsFile, QSettings::IniFormat);
+    QByteArray ar = s.value("session").toByteArray();
+    std::vector<char> in;
+    in.resize(ar.size());
+    for (int i = 0; i < ar.size(); i++)
+        in[i] = ar[i];
+
+    libtorrent::lazy_entry e;
+    libtorrent::lazy_bdecode(&in[0], &in[in.size()], e);
+    session->load_state(e);
 }
 
 void MainWindow::showAbout() {

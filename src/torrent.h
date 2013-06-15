@@ -20,6 +20,12 @@ using libtorrent::partial_piece_info;
 using std::min;
 typedef file_storage::iterator file_iterator;
 
+#ifdef PORTABLE
+    const QString driver="./qlivebittorrent-driver";
+#else
+    const QString driver="qlivebittorrent-driver";
+#endif
+
 class Torrent : public QObject
 {
     Q_OBJECT
@@ -27,12 +33,13 @@ public:
     explicit Torrent(const QString &path, const QString &mount, torrent_handle handle, QObject *parent = 0);
     QMap<QString, int> m;
     ~Torrent();
+    static void sleep(int ms);
+
 private:
     QProcess *mountProcess;
     long long readInt(const QString &s);
     void waitForDownload(int start, int end);
     bool checkForDownload(int start, int end);
-    void sleep(int ms);
     void umount();
     torrent_handle *torrent;
     int lastAsk;

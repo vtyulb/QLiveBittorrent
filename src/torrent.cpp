@@ -18,7 +18,7 @@ Torrent::Torrent(const QString &path, const QString &mount, torrent_handle handl
         qDebug() << "added path: " << "/" + QString::fromStdString(inform.files().at(i).path);
     }
 
-    umountList << "-u" << mount;
+    umountList << "-u" << "-o" << "hard_remove" << mount;
     umount();
     mountProcess = new QProcess;
     QObject::connect(mountProcess, SIGNAL(readyRead()), this, SLOT(needPiece()));
@@ -28,7 +28,7 @@ Torrent::Torrent(const QString &path, const QString &mount, torrent_handle handl
     params << mount;
     params << path;
     qDebug() << params;
-    mountProcess->start("./../driver", params);
+    mountProcess->start(driver, params);
     lastAsk = 0;
     priorities = new bool[torrent->get_torrent_info().num_pieces()];
     for (int i = 0; i < torrent->get_torrent_info().num_pieces(); i++)
@@ -129,5 +129,5 @@ void Torrent::staticRecall() {
 
 void Torrent::lesserPeers() {
     qDebug() << "lesser!";
-    torrent->set_max_connections(3);
+    torrent->set_max_connections(5);
 }
