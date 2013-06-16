@@ -43,6 +43,7 @@ private:
     void umount();
     torrent_handle *torrent;
     int lastAsk;
+    int num_pieces;
     bool *priorities;
     QString name;
     QStringList umountList;

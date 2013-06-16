@@ -39,6 +39,7 @@ Torrent::Torrent(const QString &path, const QString &mount, torrent_handle handl
     QObject::connect(staticReprioritize, SIGNAL(timeout()), this, SLOT(staticRecall()));
     QTimer::singleShot(120000, this, SLOT(lesserPeers()));
     staticReprioritize->start();
+    num_pieces = inform.num_pieces();
 }
 
 void Torrent::umount() {
@@ -65,11 +66,11 @@ void Torrent::needPiece() {
 
     int start = req.piece;
     int end = min(start + req.length / torrent->get_torrent_info().piece_length() + 1,
-                  torrent->get_torrent_info().num_pieces() - 1);
+                  num_pieces - 1);
 
     lastAsk = start;
 
-    for (int i = 0; i < torrent->get_torrent_info().num_pieces(); i++) {
+    for (int i = 0; i < num_pieces; i++) {
         torrent->reset_piece_deadline(i);
         priorities[i] = 0;
         if (i == start - 1)
@@ -82,7 +83,7 @@ void Torrent::needPiece() {
     }
 
 
-    qDebug() << "waiting for piece in range" << torrent->get_torrent_info().num_pieces();
+    qDebug() << "waiting for piece in range" << num_pieces;
     qDebug() << start << end;
     waitForDownload(start, end);
     qDebug() << "piece gotten";
@@ -118,7 +119,6 @@ void Torrent::staticRecall() {
     qDebug() << "recall called";
     int i;
     libtorrent::bitfield bit = torrent->status().pieces;
-    int num_pieces = torrent->get_torrent_info().num_pieces();
     for (i = lastAsk; i < num_pieces; i++)
         if (!bit[i])
             break;
