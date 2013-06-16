@@ -115,9 +115,11 @@ bool Torrent::checkForDownload(int start, int end) {
 }
 
 void Torrent::staticRecall() {
+    qDebug() << "recall called";
     int i;
     libtorrent::bitfield bit = torrent->status().pieces;
-    for (i = lastAsk; i < torrent->get_torrent_info().num_pieces(); i++)
+    int num_pieces = torrent->get_torrent_info().num_pieces();
+    for (i = lastAsk; i < num_pieces; i++)
         if (!bit[i])
             break;
 
@@ -125,6 +127,7 @@ void Torrent::staticRecall() {
         torrent->set_piece_deadline(j, 500);
         priorities[j] = 1;
     }
+    qDebug() << "recall finished";
 }
 
 void Torrent::lesserPeers() {

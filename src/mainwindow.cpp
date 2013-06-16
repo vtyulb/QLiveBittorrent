@@ -34,7 +34,6 @@ void MainWindow::initSession() {
     settings.max_allowed_in_request_queue = 4;
     settings.seed_choking_algorithm = settings.fastest_upload;
     settings.choking_algorithm = settings.bittyrant_choker;
-    session->listen_on(std::make_pair(6881, 6889));
     session->set_settings(settings);
 }
 
@@ -91,7 +90,7 @@ void MainWindow::updateInform() {
 void MainWindow::saveSettings() {
     QSettings s(settingsFile, QSettings::IniFormat);
     std::vector<torrent_handle> torrents = session->get_torrents();
-    for (int i = 0; i < torrents.size(); i++)
+    for (unsigned int i = 0; i < torrents.size(); i++)
         torrents[i].save_resume_data();
     Torrent::sleep(10000);
     libtorrent::entry e;
@@ -101,7 +100,7 @@ void MainWindow::saveSettings() {
     bencode(back_inserter(out), e);
     QByteArray ar;
     ar.resize(out.size());
-    for (int i = 0; i < out.size(); i++)
+    for (unsigned int i = 0; i < out.size(); i++)
         ar[i] = out[i];
 
     s.setValue("session", QVariant(ar));
