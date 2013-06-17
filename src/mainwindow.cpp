@@ -84,6 +84,12 @@ void MainWindow::updateInform() {
         ui->tableWidget->setItem(i, 3, new QTableWidgetItem(QString::number(s.download_rate)));
         ui->tableWidget->setItem(i, 4, new QTableWidgetItem(QString::number(s.num_seeds)));
         ui->tableWidget->setItem(i, 5, new QTableWidgetItem(QString::number(s.num_connections)));
+
+        std::vector<libtorrent::partial_piece_info> inform;
+        v[i].get_download_queue(inform);
+        if (inform.size())
+            for (unsigned int i = 0; i < inform.size(); i++)
+                qDebug() << inform[i].piece_index << inform[i].piece_state;
     }
 }
 
