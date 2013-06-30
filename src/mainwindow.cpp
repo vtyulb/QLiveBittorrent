@@ -99,7 +99,7 @@ void MainWindow::updateInform() {
     main->torrent->get_download_queue(inf);
     if (inf.size() > 0)
         for (unsigned int i = 0; i < inf.size(); i++)
-            printf("(%d, speed-%d) ", inf[i].piece_index, inf[i].piece_state);
+            printw("(%d, speed-%d) ", inf[i].piece_index, inf[i].piece_state);
     refresh();\
 }
 
