@@ -98,7 +98,7 @@ void MainWindow::updateInform() {
     std::vector<partial_piece_info> inf;
     main->torrent->get_download_queue(inf);
     if (inf.size() > 0)
-        for (int i = 0; i < inf.size(); i++)
+        for (unsigned int i = 0; i < inf.size(); i++)
             printf("(%d, speed-%d) ", inf[i].piece_index, inf[i].piece_state);
     refresh();\
 }

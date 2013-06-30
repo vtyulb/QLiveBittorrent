@@ -26,7 +26,7 @@ HEADERS  += mainwindow.h \
     torrentdialog.h \
     getfolderdialog.h
 
-FORMS    += mainwindow.ui \
+FORMS    += \
     torrentdialog.ui
 
 PKGCONFIG += libtorrent-rasterbar

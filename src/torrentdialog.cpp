@@ -9,6 +9,7 @@ TorrentDialog::TorrentDialog(QString name, QWidget *parent) :
     ui->groupBox->setTitle("Download path");
     ui->groupBox_2->setTitle("Mount path");
 
+
     QObject::connect(ui->buttonBox, SIGNAL(accepted()), this, SLOT(finish()));
     QObject::connect(ui->buttonBox, SIGNAL(rejected()), this, SLOT(deleteLater()));
     torrentName = name;
