@@ -1,31 +1,22 @@
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
 
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::MainWindow)
-{
-    ui->setupUi(this);
-
-    QObject::connect(ui->actionExit, SIGNAL(triggered()), this, SLOT(close()));
-    QObject::connect(ui->actionAdd_torrent, SIGNAL(triggered()), this, SLOT(addTorrent()));
-    QObject::connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(showAbout()));
-    QObject::connect(ui->actionAbout_Qt, SIGNAL(triggered()), this, SLOT(showAboutQt()));
-
+MainWindow::MainWindow(QString torrent, QString downloadPath, QString mountPath, bool gui, QObject *parent): QObject(parent) {
     initSession();
     loadSettings();
-    initTableWidgetHeader();
-    updateInform();
-    QTimer *timer = new QTimer;
-    timer->setInterval(1000);
-    QObject::connect(timer, SIGNAL(timeout()), this, SLOT(updateInform()));
-    timer->start();
+    if (!gui)
+        realAddTorrent(torrent, downloadPath, mountPath);
+    else {
+        fake = new QMainWindow;
+        if (QFile(torrent).exists())
+            findPaths(torrent);
+        else
+            addTorrent();
+    }
 }
 
 MainWindow::~MainWindow()
 {
     saveSettings();
-    delete ui;
 }
 
 void MainWindow::initSession() {
@@ -38,14 +29,21 @@ void MainWindow::initSession() {
 }
 
 void MainWindow::addTorrent() {
-    QString torrent = QFileDialog::getOpenFileName(this, QString(), QString(),
+    QString torrent = QFileDialog::getOpenFileName(fake, QString(), QString(),
                                                    QString("*.torrent"));
-    TorrentDialog *dialog = new TorrentDialog(torrent, this);
+    findPaths(torrent);
+}
+
+void MainWindow::findPaths(QString torrent) {
+    TorrentDialog *dialog = new TorrentDialog(torrent, fake);
     dialog->show();
     QObject::connect(dialog, SIGNAL(success(QString,QString,QString)), this, SLOT(realAddTorrent(QString, QString, QString)));
 }
 
 void MainWindow::realAddTorrent(QString torrentFile, QString torrentPath, QString mountPath) {
+    if (!QFile::exists(torrentFile))
+        die("torrent file not found");
+
     if (torrentPath[torrentPath.length() - 1] != QChar('/'))
         torrentPath += "/";
     if (mountPath[mountPath.length() - 1] != QChar('/'))
@@ -59,32 +57,14 @@ void MainWindow::realAddTorrent(QString torrentFile, QString torrentPath, QStrin
     new Torrent(torrentPath + QString::fromStdString(inf->name()), mountPath + QString::fromStdString(inf->name()), session->add_torrent(p), this);
 }
 
-void MainWindow::initTableWidgetHeader() {
-    ui->tableWidget->setColumnCount(6);
-    ui->tableWidget->setHorizontalHeaderItem(0, new QTableWidgetItem(QString("Name")));
-    ui->tableWidget->setHorizontalHeaderItem(1, new QTableWidgetItem(QString("Size")));
-    ui->tableWidget->setHorizontalHeaderItem(2, new QTableWidgetItem(QString("Status")));
-    ui->tableWidget->setHorizontalHeaderItem(3, new QTableWidgetItem(QString("Speed")));
-    ui->tableWidget->setHorizontalHeaderItem(4, new QTableWidgetItem(QString("Seeds")));
-    ui->tableWidget->setHorizontalHeaderItem(5, new QTableWidgetItem(QString("Connected")));
-}
-
 void MainWindow::updateInform() {
     std::vector<torrent_handle> v = session->get_torrents();
 
-    ui->tableWidget->setRowCount(v.size());
     for (unsigned int i = 0; i < v.size(); i++) {
         torrent_status s = v[i].status();
         torrent_info inf = v[i].get_torrent_info();
-        ui->tableWidget->setItem(i, 0, new QTableWidgetItem(QString::fromStdString(v[i].name())));
-        ui->tableWidget->setItem(i, 1, new QTableWidgetItem(QString::number(inf.total_size())));
         std::vector<partial_piece_info> tmp;
         v[i].get_download_queue(tmp);
-        ui->tableWidget->setItem(i, 2, new QTableWidgetItem(QIcon(QPixmap::fromImage(GenerateImage::generate(s.pieces, tmp))), QString()));
-        ui->tableWidget->setItem(i, 3, new QTableWidgetItem(QString::number(s.download_rate)));
-        ui->tableWidget->setItem(i, 4, new QTableWidgetItem(QString::number(s.num_seeds)));
-        ui->tableWidget->setItem(i, 5, new QTableWidgetItem(QString::number(s.num_connections)));
-
         std::vector<libtorrent::partial_piece_info> inform;
         v[i].get_download_queue(inform);
         if (inform.size())
@@ -125,10 +105,7 @@ void MainWindow::loadSettings() {
     session->load_state(e);
 }
 
-void MainWindow::showAbout() {
-    QMessageBox::about(this, QString("About QLiveBittorrent"), QString("QLiveBittorrent - bittorrent client.\nWritten by Vladislav Tyulbashev.\n<vladislav.tyulbashev@yandex.ru>"));
-}
-
-void MainWindow::showAboutQt() {
-    QMessageBox::aboutQt(this);
+void MainWindow::die(QString error) {
+    qDebug() << error;
+    exit(1);
 }

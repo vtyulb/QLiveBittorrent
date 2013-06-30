@@ -1,7 +1,6 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QMainWindow>
 #include <QFileDialog>
 #include <QTimer>
 #include <QDebug>
@@ -11,6 +10,8 @@
 #include <QPainter>
 #include <QMessageBox>
 #include <QByteArray>
+#include <QMainWindow>
+#include <QApplication>
 
 #include <torrent.h>
 #include <generateimage.h>
@@ -27,9 +28,6 @@
 #include "libtorrent/session.hpp"
 #include "boost/filesystem/operations.hpp"
 
-namespace Ui {
-    class MainWindow;
-}
 
 using libtorrent::torrent_info;
 using libtorrent::torrent_handle;
@@ -40,28 +38,27 @@ Q_DECLARE_METATYPE(libtorrent::entry)
 
 const QString settingsFile = QDir::homePath() + "/.qlivebittorrent/qlivebittorrent.ini";
 
-class MainWindow : public QMainWindow
+class MainWindow: public QObject
 {
     Q_OBJECT
     
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(QString torrent, QString downloadPath, QString mountPath, bool gui, QObject *parent = 0);
     ~MainWindow();
     
 private:
-    Ui::MainWindow *ui;
     libtorrent::session *session;
+    QMainWindow *fake;
 
     void initSession();
-    void initTableWidgetHeader();
+    void findPaths(QString torrent);
+    void die(QString error);
     void saveSettings();
     void loadSettings();
 private slots:
     void addTorrent();
     void realAddTorrent(QString torrentFile, QString torrentPath, QString mountPath);
     void updateInform();
-    void showAbout();
-    void showAboutQt();
 };
 
 #endif // MAINWINDOW_H
