@@ -27,7 +27,7 @@
 #include "libtorrent/lazy_entry.hpp"
 #include "libtorrent/session.hpp"
 #include "boost/filesystem/operations.hpp"
-
+#include "curses.h"
 
 using libtorrent::torrent_info;
 using libtorrent::torrent_handle;
@@ -49,6 +49,8 @@ public:
 private:
     libtorrent::session *session;
     QMainWindow *fake;
+    QByteArray *standartText;
+    Torrent *main;
 
     void initSession();
     void findPaths(QString torrent);

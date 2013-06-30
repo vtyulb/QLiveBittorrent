@@ -11,7 +11,11 @@ MainWindow::MainWindow(QString torrent, QString downloadPath, QString mountPath,
             findPaths(torrent);
         else
             addTorrent();
+
+        fake->deleteLater();
     }
+
+    initscr();
 }
 
 MainWindow::~MainWindow()
@@ -31,7 +35,8 @@ void MainWindow::initSession() {
 void MainWindow::addTorrent() {
     QString torrent = QFileDialog::getOpenFileName(fake, QString(), QString(),
                                                    QString("*.torrent"));
-    findPaths(torrent);
+    if (QFile(torrent).exists())
+        findPaths(torrent);
 }
 
 void MainWindow::findPaths(QString torrent) {
@@ -44,6 +49,10 @@ void MainWindow::realAddTorrent(QString torrentFile, QString torrentPath, QStrin
     if (!QFile::exists(torrentFile))
         die("torrent file not found");
 
+    standartText = new QByteArray;
+    *standartText = ("Torrent file: " + torrentFile + "\nDownload path: " + torrentPath + "\nMount path: " + mountPath + "\n" +
+               "==================================================================\n").toLocal8Bit();
+
     if (torrentPath[torrentPath.length() - 1] != QChar('/'))
         torrentPath += "/";
     if (mountPath[mountPath.length() - 1] != QChar('/'))
@@ -54,11 +63,16 @@ void MainWindow::realAddTorrent(QString torrentFile, QString torrentPath, QStrin
     p.ti = inf;
     p.storage_mode = libtorrent::storage_mode_allocate;
 
-    new Torrent(torrentPath + QString::fromStdString(inf->name()), mountPath + QString::fromStdString(inf->name()), session->add_torrent(p), this);
+    main = new Torrent(torrentPath + QString::fromStdString(inf->name()), mountPath + QString::fromStdString(inf->name()), session->add_torrent(p), this);
+
+    QTimer *timer = new QTimer;
+    timer->setInterval(500);
+    QObject::connect(timer, SIGNAL(timeout()), this, SLOT(updateInform()));
+    timer->start();
 }
 
 void MainWindow::updateInform() {
-    std::vector<torrent_handle> v = session->get_torrents();
+    /*std::vector<torrent_handle> v = session->get_torrents();
 
     for (unsigned int i = 0; i < v.size(); i++) {
         torrent_status s = v[i].status();
@@ -70,7 +84,16 @@ void MainWindow::updateInform() {
         if (inform.size())
             for (unsigned int i = 0; i < inform.size(); i++)
                 qDebug() << inform[i].piece_index << inform[i].piece_state;
-    }
+    }*/
+
+
+    clear();
+    libtorrent::torrent_status status = main->torrent->status();
+    libtorrent::torrent_info info = main->torrent->get_torrent_info();
+    printw("%s", standartText->constData());
+    printw("%d of %d peers connected; %d of %d MB downloaded; speed - %dKB/s",
+           status.num_connections, status.num_seeds, status.total_payload_download / 1000000, info.total_size() / 1000000, status.download_rate / 1000);
+    refresh();\
 }
 
 void MainWindow::saveSettings() {

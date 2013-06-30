@@ -34,6 +34,7 @@ public:
     QMap<QString, int> m;
     ~Torrent();
     static void sleep(int ms);
+    torrent_handle *torrent;
 
 private:
     QProcess *mountProcess;
@@ -41,7 +42,6 @@ private:
     void waitForDownload(int start, int end);
     bool checkForDownload(int start, int end);
     void umount();
-    torrent_handle *torrent;
     int lastAsk;
     int num_pieces;
     bool *priorities;
