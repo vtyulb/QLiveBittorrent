@@ -83,10 +83,7 @@ void Torrent::needPiece() {
     }
 
 
-    qDebug() << "waiting for piece in range" << num_pieces;
-    qDebug() << start << end;
     waitForDownload(start, end);
-    qDebug() << "piece gotten";
 
     mountProcess->write("1\n");
 }
@@ -129,6 +126,5 @@ void Torrent::staticRecall() {
 }
 
 void Torrent::lesserPeers() {
-    qDebug() << "lesser!";
     torrent->set_max_connections(5);
 }
