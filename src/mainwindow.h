@@ -43,7 +43,7 @@ class MainWindow: public QObject
     Q_OBJECT
     
 public:
-    explicit MainWindow(QString torrent, QString downloadPath, QString mountPath, bool gui, QObject *parent = 0);
+    explicit MainWindow(QString torrent, QString downloadPath, QString mountPath, QString rate, bool gui, QObject *parent = 0);
     ~MainWindow();
     
 private:
@@ -52,11 +52,9 @@ private:
     QByteArray *standartText;
     Torrent *main;
 
-    void initSession();
+    void initSession(QString rate);
     void findPaths(QString torrent);
     void die(QString error);
-    void saveSettings();
-    void loadSettings();
 private slots:
     void addTorrent();
     void realAddTorrent(QString torrentFile, QString torrentPath, QString mountPath);

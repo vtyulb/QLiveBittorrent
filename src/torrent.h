@@ -35,6 +35,7 @@ public:
     ~Torrent();
     static void sleep(int ms);
     torrent_handle *torrent;
+    int lastAsk;
 
 private:
     QProcess *mountProcess;
@@ -42,7 +43,6 @@ private:
     void waitForDownload(int start, int end);
     bool checkForDownload(int start, int end);
     void umount();
-    int lastAsk;
     int num_pieces;
     bool *priorities;
     QString name;
