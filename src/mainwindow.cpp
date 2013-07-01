@@ -5,6 +5,7 @@ MainWindow::MainWindow(QString torrent, QString downloadPath, QString mountPath,
     initscr();
     nodelay(stdscr, true);
     noecho();
+    main = NULL;
     if (!gui)
         realAddTorrent(torrent, downloadPath, mountPath);
     else {
@@ -19,6 +20,7 @@ MainWindow::MainWindow(QString torrent, QString downloadPath, QString mountPath,
 }
 
 MainWindow::~MainWindow() {
+    endwin();
 }
 
 void MainWindow::initSession(QString rate) {
@@ -51,9 +53,25 @@ void MainWindow::updateStandartText() {
     QString text;
     if (session->download_rate_limit() != 0)
         text += QString("Download rate limit: %1KB/s\n").arg(session->download_rate_limit() / 1000);
+
+    if (main != NULL) {
+        text += "Status: ";
+        if (main->torrent->status().state == torrent_status::downloading)
+            text += "downloading\n";
+        else if (main->torrent->status().state == torrent_status::finished)
+            text += "finished\n";
+        else if (main->torrent->status().state == torrent_status::seeding)
+            text += "seeding\n";
+        else if (main->torrent->status().state == torrent_status::checking_files)
+            text += "checking files\n";
+        else
+            text += "Calculating first 1000000000! digits of PI";
+    }
+
     for (int i = 1; i < stdscr->_maxx; i++)
         text += '=';
     text += '\n';
+
     standartText = standartText.left(standartTextLen) + text.toLocal8Bit();
 }
 
@@ -99,9 +117,9 @@ void MainWindow::updateInform() {
     libtorrent::torrent_status status = main->torrent->status();
     libtorrent::torrent_info info = main->torrent->get_torrent_info();
     printw("%s", standartText.constData());
-    printw("%d of %d peers connected; %d of %d MB downloaded; progress - %d\%; speed - %dKB/s\n",
-           status.num_connections, status.list_seeds + status.list_peers, int((info.total_size() / 1000000) * status.progress), info.total_size() / 1000000,
-           int(status.progress * 100), status.download_rate / 1000);
+    printw("%d of %d peers connected; %d of %d MB downloaded; progress - %d\%; dspeed - %dKB/s; uspeed - %dKB/s\n",
+           status.num_connections, status.list_seeds + status.list_peers, int((info.total_size() / 1000000) * status.progress),
+           info.total_size() / 1000000, int(status.progress * 100), status.download_rate / 1000, status.upload_rate / 1000);
     printw("Last ask - piece №%d\n", main->lastAsk);
     std::vector<partial_piece_info> inf;
     main->torrent->get_download_queue(inf);
@@ -124,6 +142,7 @@ void MainWindow::setupTimers() {
 
     QTimer *timer = new QTimer;
     timer->setInterval(1000);
+    QObject::connect(timer, SIGNAL(timeout()), this, SLOT(updateStandartText()));
     QObject::connect(timer, SIGNAL(timeout()), this, SLOT(updateInform()));
     timer->start();
 }
