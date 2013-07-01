@@ -82,9 +82,8 @@ void Torrent::needPiece() {
         priorities[i] = 1;
     }
 
-
     waitForDownload(start, end);
-
+    assert(mountProcess->isWritable());
     mountProcess->write("1\n");
 }
 
@@ -93,6 +92,8 @@ long long Torrent::readInt(const QString &s) {
 }
 
 void Torrent::waitForDownload(int start, int end) {
+    assert(start >= 0);
+    assert(end <= torrent->get_torrent_info().num_pieces());
     while (!checkForDownload(start, end))
         sleep(100);
 }
@@ -105,6 +106,12 @@ void Torrent::sleep(int ms) {
 
 bool Torrent::checkForDownload(int start, int end) {
     libtorrent::bitfield bit = torrent->status().pieces;
+    if (bit.size() < end) {
+//        assert(false);
+        printw("very hard error");
+        return false;
+    }
+
     for (int i = start; i <= end; i++)
         if (!bit[i])
             return false;

@@ -8,9 +8,12 @@
 #include <QDir>
 #include <QEventLoop>
 #include <QTimer>
+
 #include <libtorrent/torrent_handle.hpp>
 #include <libtorrent/ip_filter.hpp>
 #include <libtorrent/peer_info.hpp>
+
+#include <curses.h>
 
 using libtorrent::file_storage;
 using libtorrent::torrent_info;

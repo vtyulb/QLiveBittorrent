@@ -94,7 +94,7 @@ void MainWindow::updateInform() {
     printw("%s", standartText->constData());
     printw("%d of %d peers connected; %d of %d MB downloaded; speed - %dKB/s\n",
            status.num_connections, status.list_seeds, status.total_payload_download / 1000000, info.total_size() / 1000000, status.download_rate / 1000);
-    printw("Last ask - %d piece\n", main->lastAsk);
+    printw("Last ask - piece №%d\n", main->lastAsk);
     std::vector<partial_piece_info> inf;
     main->torrent->get_download_queue(inf);
     if (inf.size() > 0)
