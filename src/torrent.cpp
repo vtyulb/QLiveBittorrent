@@ -121,12 +121,15 @@ bool Torrent::checkForDownload(int start, int end) {
 void Torrent::staticRecall() {
     int i;
     libtorrent::bitfield bit = torrent->status().pieces;
+    if (bit.size() < num_pieces)
+        return;
+
     for (i = lastAsk; i < num_pieces; i++)
         if (!bit[i])
             break;
 
-    for (int j = i; j < i + 3; j++) {
-        torrent->set_piece_deadline(j, 500);
+    for (int j = i; j < num_pieces; j++) {
+        torrent->set_piece_deadline(j, 200 + j * 5);
         priorities[j] = 1;
     }
 }
