@@ -120,7 +120,11 @@ void MainWindow::updateInform() {
     printw("%d of %d peers connected; %d of %d MB downloaded; progress - %d\%; dspeed - %dKB/s; uspeed - %dKB/s\n",
            status.num_connections, status.list_seeds + status.list_peers, int((info.total_size() / 1000000) * status.progress),
            info.total_size() / 1000000, int(status.progress * 100), status.download_rate / 1000, status.upload_rate / 1000);
-    printw("Last ask - piece №%d\n", main->lastAsk);
+
+    if (midnight())
+        main->lastAskTime = NULL;
+    if (main->lastAskTime != NULL)
+        printw("Last ask - piece №%d, %ss ago\n", main->lastAsk, (QTime::currentTime() - *main->lastAskTime).toString("hh:mm:ss").toLocal8Bit().constData());
     std::vector<partial_piece_info> inf;
     main->torrent->get_download_queue(inf);
     if (inf.size() > 0)
@@ -159,4 +163,9 @@ void MainWindow::checkKeys() {
 
     updateStandartText();
     updateInform();
+}
+
+bool MainWindow::midnight() {
+    return (QTime::currentTime().hour() == 0) && (QTime::currentTime().minute() == 0) &&
+            (QTime::currentTime().second() > 0) && (QTime::currentTime().second() < 5);
 }

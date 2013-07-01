@@ -8,6 +8,7 @@
 #include <QDir>
 #include <QEventLoop>
 #include <QTimer>
+#include <QTime>
 
 #include <libtorrent/torrent_handle.hpp>
 #include <libtorrent/ip_filter.hpp>
@@ -29,6 +30,10 @@ typedef file_storage::iterator file_iterator;
     const QString driver="qlivebittorrent-driver";
 #endif
 
+inline QTime operator -(const QTime &a, const QTime &b) {
+    return QTime(a.hour() - b.hour(), a.minute() - b.minute(), a.second() - b.second());
+}
+
 class Torrent : public QObject
 {
     Q_OBJECT
@@ -39,6 +44,7 @@ public:
     static void sleep(int ms);
     torrent_handle *torrent;
     int lastAsk;
+    QTime *lastAskTime;
 
 private:
     QProcess *mountProcess;

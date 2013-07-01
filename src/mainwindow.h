@@ -12,6 +12,7 @@
 #include <QByteArray>
 #include <QMainWindow>
 #include <QApplication>
+#include <QTime>
 
 #include <torrent.h>
 #include <generateimage.h>
@@ -57,6 +58,8 @@ private:
     void findPaths(QString torrent);
     void die(QString error);
     void setupTimers();
+
+    bool midnight();
 private slots:
     void addTorrent();
     void realAddTorrent(QString torrentFile, QString torrentPath, QString mountPath);

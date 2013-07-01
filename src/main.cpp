@@ -2,6 +2,7 @@
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string.hpp>
 #include <QCoreApplication>
+#include <QApplication>
 #include <QDebug>
 
 namespace po=boost::program_options;

@@ -3,20 +3,17 @@
 Torrent::Torrent(const QString &path, const QString &mount, torrent_handle handle, QObject *parent) :
     QObject(parent)
 {
-    qDebug() << mount << path;
+    lastAskTime = NULL;
     QDir tmp;
     tmp.mkdir(mount);
     torrent = new torrent_handle(handle);
     torrent->set_max_connections(15);
 
     name = QString::fromStdString(handle.name());
-    qDebug() << tmp.mkpath(mount);
     torrent_info inform = handle.get_torrent_info();
     int cnt = 0;
-    for (file_iterator i = inform.begin_files(); i != inform.end_files(); i++, cnt++) {
+    for (file_iterator i = inform.begin_files(); i != inform.end_files(); i++, cnt++)
         m["/" + QString::fromStdString(inform.files().at(i).path)] = cnt;
-        qDebug() << "added path: " << "/" + QString::fromStdString(inform.files().at(i).path);
-    }
 
     umountList << "-u" << "-o" << "hard_remove" << mount;
     umount();
@@ -54,6 +51,9 @@ Torrent::~Torrent() {
 }
 
 void Torrent::needPiece() {
+    if (lastAskTime == NULL)
+        lastAskTime = new QTime;
+    *lastAskTime = QTime::currentTime();
     char string[1000];
     mountProcess->readLine(string, 999);
     QString idString = QString(string);
