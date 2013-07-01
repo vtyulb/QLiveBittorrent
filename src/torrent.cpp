@@ -24,7 +24,6 @@ Torrent::Torrent(const QString &path, const QString &mount, torrent_handle handl
     params << "-f"; //force don't know what
     params << mount;
     params << path;
-    qDebug() << params;
     mountProcess->start(driver, params);
     lastAsk = 0;
     priorities = new bool[torrent->get_torrent_info().num_pieces()];

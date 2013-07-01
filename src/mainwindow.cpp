@@ -14,8 +14,6 @@ MainWindow::MainWindow(QString torrent, QString downloadPath, QString mountPath,
             findPaths(torrent);
         else
             addTorrent();
-
-        fake->deleteLater();
     }
 }
 
@@ -65,7 +63,7 @@ void MainWindow::updateStandartText() {
         else if (main->torrent->status().state == torrent_status::checking_files)
             text += "checking files\n";
         else
-            text += "Calculating first 1000000000! digits of PI";
+            text += "Calculating first 1000000000! digits of PI\n";
     }
 
     for (int i = 1; i < stdscr->_maxx; i++)
