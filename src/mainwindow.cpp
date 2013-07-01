@@ -137,4 +137,5 @@ void MainWindow::checkKeys() {
         session->set_download_rate_limit(session->download_rate_limit() - 10000);
 
     updateStandartText();
+    updateInform();
 }
