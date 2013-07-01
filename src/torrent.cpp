@@ -107,7 +107,6 @@ void Torrent::sleep(int ms) {
 bool Torrent::checkForDownload(int start, int end) {
     libtorrent::bitfield bit = torrent->status().pieces;
     if (bit.size() < end) {
-//        assert(false);
         printw("very hard error");
         return false;
     }

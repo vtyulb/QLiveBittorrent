@@ -49,16 +49,20 @@ public:
 private:
     libtorrent::session *session;
     QMainWindow *fake;
-    QByteArray *standartText;
+    QByteArray standartText;
+    unsigned int standartTextLen;
     Torrent *main;
 
     void initSession(QString rate);
     void findPaths(QString torrent);
     void die(QString error);
+    void updateStandartText();
+    void setupTimers();
 private slots:
     void addTorrent();
     void realAddTorrent(QString torrentFile, QString torrentPath, QString mountPath);
     void updateInform();
+    void checkKeys();
 };
 
 #endif // MAINWINDOW_H

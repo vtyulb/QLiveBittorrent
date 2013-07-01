@@ -2,6 +2,8 @@
 
 MainWindow::MainWindow(QString torrent, QString downloadPath, QString mountPath, QString rate, bool gui, QObject *parent): QObject(parent) {
     initSession(rate);
+    initscr();
+    nodelay(stdscr, true);
     if (!gui)
         realAddTorrent(torrent, downloadPath, mountPath);
     else {
@@ -13,8 +15,6 @@ MainWindow::MainWindow(QString torrent, QString downloadPath, QString mountPath,
 
         fake->deleteLater();
     }
-
-    initscr();
 }
 
 MainWindow::~MainWindow() {
@@ -46,13 +46,23 @@ void MainWindow::findPaths(QString torrent) {
     QObject::connect(dialog, SIGNAL(rejected()), qApp, SLOT(quit()));
 }
 
+void MainWindow::updateStandartText() {
+    QString text;
+    if (session->download_rate_limit() != 0)
+        text += QString("Download rate limit: %1KB/s\n").arg(session->download_rate_limit() / 1000);
+    for (int i = 1; i < stdscr->_maxx; i++)
+        text += '=';
+    text += '\n';
+    standartText = standartText.left(standartTextLen) + text.toLocal8Bit();
+}
+
 void MainWindow::realAddTorrent(QString torrentFile, QString torrentPath, QString mountPath) {
     if (!QFile::exists(torrentFile))
         die("torrent file not found");
 
-    standartText = new QByteArray;
-    *standartText = ("Torrent file: " + torrentFile + "\nDownload path: " + torrentPath + "\nMount path: " + mountPath + "\n" +
-               "==================================================================\n").toLocal8Bit();
+    standartText = ("Torrent file: " + torrentFile + "\nDownload path: " + torrentPath + "\nMount path: " + mountPath + "\n").toLocal8Bit();
+    standartTextLen = standartText.size();
+    updateStandartText();
 
     if (torrentPath[torrentPath.length() - 1] != QChar('/'))
         torrentPath += "/";
@@ -65,11 +75,7 @@ void MainWindow::realAddTorrent(QString torrentFile, QString torrentPath, QStrin
     p.storage_mode = libtorrent::storage_mode_allocate;
 
     main = new Torrent(torrentPath + QString::fromStdString(inf->name()), mountPath + QString::fromStdString(inf->name()), session->add_torrent(p), this);
-
-    QTimer *timer = new QTimer;
-    timer->setInterval(1000);
-    QObject::connect(timer, SIGNAL(timeout()), this, SLOT(updateInform()));
-    timer->start();
+    setupTimers();
 }
 
 void MainWindow::updateInform() {
@@ -91,7 +97,7 @@ void MainWindow::updateInform() {
     clear();
     libtorrent::torrent_status status = main->torrent->status();
     libtorrent::torrent_info info = main->torrent->get_torrent_info();
-    printw("%s", standartText->constData());
+    printw("%s", standartText.constData());
     printw("%d of %d peers connected; %d of %d MB downloaded; speed - %dKB/s\n",
            status.num_connections, status.list_seeds, status.total_payload_download / 1000000, info.total_size() / 1000000, status.download_rate / 1000);
     printw("Last ask - piece №%d\n", main->lastAsk);
@@ -106,4 +112,29 @@ void MainWindow::updateInform() {
 void MainWindow::die(QString error) {
     qDebug() << error;
     exit(1);
+}
+
+void MainWindow::setupTimers() {
+    QTimer *keysTimer = new QTimer;
+    keysTimer->setInterval(10);
+    QObject::connect(keysTimer, SIGNAL(timeout()), this, SLOT(checkKeys()));
+    keysTimer->start();
+
+    QTimer *timer = new QTimer;
+    timer->setInterval(1000);
+    QObject::connect(timer, SIGNAL(timeout()), this, SLOT(updateInform()));
+    timer->start();
+}
+
+void MainWindow::checkKeys() {
+    int key = wgetch(stdscr);
+    if (key == ERR)
+        return;
+
+    if (key == '+')
+        session->set_download_rate_limit(session->download_rate_limit() + 10000);
+    else if (key == '-')
+        session->set_download_rate_limit(session->download_rate_limit() - 10000);
+
+    updateStandartText();
 }
