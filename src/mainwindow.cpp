@@ -122,7 +122,7 @@ void MainWindow::updateInform() {
     if (midnight())
         main->lastAskTime = NULL;
     if (main->lastAskTime != NULL)
-        printw("Last ask - piece №%d, %ss ago\n", main->lastAsk, (QTime::currentTime() - *main->lastAskTime).toString("hh:mm:ss").toLocal8Bit().constData());
+        printw("Last ask - piece №%d, %ss ago\n", main->lastAsk, (QTime::currentTime() - *main->lastAskTime).toString("HH:mm:ss").toLocal8Bit().constData());
     std::vector<partial_piece_info> inf;
     main->torrent->get_download_queue(inf);
     if (inf.size() > 0)

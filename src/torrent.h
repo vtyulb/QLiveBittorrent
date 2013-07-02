@@ -31,7 +31,9 @@ typedef file_storage::iterator file_iterator;
 #endif
 
 inline QTime operator -(const QTime &a, const QTime &b) {
-    return QTime(a.hour() - b.hour(), a.minute() - b.minute(), a.second() - b.second());
+    int seconds = a.second() + a.minute() * 60 + a.hour() * 3600;
+    seconds -= b.second() + b.minute() * 60 + b.hour() * 3600;
+    return QTime(seconds / 3600, seconds % 3600 / 60, seconds % 60);
 }
 
 class Torrent : public QObject
