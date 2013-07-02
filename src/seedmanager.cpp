@@ -56,11 +56,7 @@ void SeedManager::updateInform() {
     printw("Seeding on %d torrents:\n", v.size());
     for (int i = 0; i < v.size(); i++) {
         printw("%d: %s; u - %d; uploaded - %dM; state - ", i, v[i].name().c_str(), v[i].status().upload_payload_rate, v[i].status().total_payload_upload / 1000000);
-        if (v[i].status().state == torrent_status::seeding)
-            printw("seeding\n");
-        else
-            printw("unknown state\n");
-
+        printw("%s\n", getNormalStatus(v[i].status().state).toLocal8Bit().constData());
     }
 
     refresh();

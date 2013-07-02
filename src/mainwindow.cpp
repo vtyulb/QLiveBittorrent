@@ -86,16 +86,8 @@ void MainWindow::updateStandartText() {
 
     if (main != NULL) {
         text += "Status: ";
-        if (main->torrent->status().state == torrent_status::downloading)
-            text += "downloading\n";
-        else if (main->torrent->status().state == torrent_status::finished)
-            text += "finished\n";
-        else if (main->torrent->status().state == torrent_status::seeding)
-            text += "seeding\n";
-        else if (main->torrent->status().state == torrent_status::checking_files)
-            text += "checking files\n";
-        else
-            text += "Calculating first 1000000000! digits of PI\n";
+        text += getNormalStatus(main->torrent->status().state);
+        text += "\n";
     }
 
     for (int i = 1; i < stdscr->_maxx; i++)
