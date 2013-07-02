@@ -38,13 +38,17 @@ MainWindow::~MainWindow() {
 
     std::ofstream out((settingsPath + main->torrent->get_torrent_info().name().c_str() + ".fastresume").toLocal8Bit(), std::ios_base::binary);
     bencode(std::ostream_iterator<char>(out), *rd->resume_data);
+    out.flush();
 
     qDebug() << resumeName;
     QFile fout(settingsPath + resumeName + ".qlivebittorrent");
     fout.open(QIODevice::WriteOnly);
     QTextStream cout(&fout);
-    cout << resumeTorrentName << "\n" << resumeSavePath << "\n" << resumeName + ".fastresume";
+    cout << resumeTorrentName << "\n" << resumeSavePath << "\n" << resumeName + ".fastresume" << "\n";
     cout.flush();
+
+    delete session;
+    exit(0);
 }
 
 void MainWindow::initSession(QString rate) {
@@ -70,7 +74,9 @@ void MainWindow::findPaths(QString torrent) {
     TorrentDialog *dialog = new TorrentDialog(torrent, fake);
     dialog->show();
     QObject::connect(dialog, SIGNAL(success(QString,QString,QString)), this, SLOT(realAddTorrent(QString, QString, QString)));
+    QObject::connect(dialog, SIGNAL(success(QString,QString,QString)), dialog, SLOT(deleteLater()));
     QObject::connect(dialog, SIGNAL(rejected()), qApp, SLOT(quit()));
+    QObject::connect(dialog, SIGNAL(rejected()), dialog, SLOT(deleteLater()));
 }
 
 void MainWindow::updateStandartText() {
@@ -142,11 +148,11 @@ void MainWindow::updateInform() {
     }*/
 
 
-    clear();
+    erase();
     libtorrent::torrent_status status = main->torrent->status();
     libtorrent::torrent_info info = main->torrent->get_torrent_info();
     printw("%s", standartText.constData());
-    printw("%d of %d peers connected; %d of %d MB downloaded; progress - %d\%; dspeed - %dKB/s; uspeed - %dKB/s\n",
+    printw("%d of %d peers connected; %d of %d MB downloaded; progress - %d\%; d - %dKB/s; u - %dKB/s\n",
            status.num_connections, status.list_seeds + status.list_peers, int((info.total_size() / 1000000) * status.progress),
            info.total_size() / 1000000, int(status.progress * 100), status.download_rate / 1000, status.upload_rate / 1000);
 

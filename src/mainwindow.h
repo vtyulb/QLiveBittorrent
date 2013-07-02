@@ -18,6 +18,7 @@
 #include <torrent.h>
 #include <generateimage.h>
 #include <torrentdialog.h>
+#include <constants.h>
 
 #include <iostream>
 #include <fstream>
@@ -40,8 +41,6 @@ using libtorrent::alert;
 using libtorrent::bencode;
 
 Q_DECLARE_METATYPE(libtorrent::entry)
-
-const QString settingsPath = QDir::homePath() + "/.qlivebittorrent/";
 
 class MainWindow: public QObject
 {

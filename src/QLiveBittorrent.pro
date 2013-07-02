@@ -18,13 +18,16 @@ SOURCES += main.cpp\
     torrent.cpp \
     generateimage.cpp \
     torrentdialog.cpp \
-    getfolderdialog.cpp
+    getfolderdialog.cpp \
+    seedmanager.cpp
 
 HEADERS  += mainwindow.h \
     torrent.h \
     generateimage.h \
     torrentdialog.h \
-    getfolderdialog.h
+    getfolderdialog.h \
+    seedmanager.h \
+    constants.h
 
 FORMS    += \
     torrentdialog.ui
@@ -32,4 +35,4 @@ FORMS    += \
 PKGCONFIG += libtorrent-rasterbar
 
 DEFINES += BOOST_ASIO_DYN_LINK TORRENT_USE_OPENSSL BOOST_ASIO_HASH_MAP_BUCKETS=1021 BOOST_EXCEPTION_DISABLE BOOST_ASIO_ENABLE_CANCELIO BOOST_ASIO_DYN_LINK TORRENT_LINKING_SHARED
-DEFINES += PORTABLE
+#DEFINES += PORTABLE
