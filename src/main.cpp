@@ -1,6 +1,10 @@
 #include "mainwindow.h"
+
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string.hpp>
+
+#include <signal.h>
+
 #include <QCoreApplication>
 #include <QApplication>
 #include <QDebug>
@@ -19,8 +23,14 @@ void showHelp() {
     exit(0);
 }
 
+void sigtermListened(int sig) {
+    qApp->quit();
+}
+
 int main(int argc, char *argv[])
 {
+    signal(SIGTERM, sigtermListened);
+
     std::string torrent;
     std::string downloadPath;
     std::string mountPath;

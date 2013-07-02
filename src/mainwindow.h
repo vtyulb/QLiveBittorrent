@@ -13,6 +13,7 @@
 #include <QMainWindow>
 #include <QApplication>
 #include <QTime>
+#include <QFileInfo>
 
 #include <torrent.h>
 #include <generateimage.h>
@@ -27,17 +28,20 @@
 #include "libtorrent/torrent_info.hpp"
 #include "libtorrent/lazy_entry.hpp"
 #include "libtorrent/session.hpp"
+#include "libtorrent/alert_types.hpp"
 #include "boost/filesystem/operations.hpp"
 #include "curses.h"
 
 using libtorrent::torrent_info;
 using libtorrent::torrent_handle;
 using libtorrent::torrent_status;
-using libtorrent::add_torrent_params;
+using libtorrent::add_torrent_params;\
+using libtorrent::alert;
+using libtorrent::bencode;
 
 Q_DECLARE_METATYPE(libtorrent::entry)
 
-const QString settingsFile = QDir::homePath() + "/.qlivebittorrent/qlivebittorrent.ini";
+const QString settingsPath = QDir::homePath() + "/.qlivebittorrent/";
 
 class MainWindow: public QObject
 {
@@ -53,6 +57,10 @@ private:
     QByteArray standartText;
     unsigned int standartTextLen;
     Torrent *main;
+
+    QString resumeTorrentName;
+    QString resumeSavePath;
+    QString resumeName;
 
     void initSession(QString rate);
     void findPaths(QString torrent);
