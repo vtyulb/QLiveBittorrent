@@ -36,9 +36,13 @@ MainWindow::~MainWindow() {
         qDebug() << "Very big fail";
 
 
-    std::ofstream out((settingsPath + main->torrent->get_torrent_info().name().c_str() + ".fastresume").toLocal8Bit(), std::ios_base::binary);
-    bencode(std::ostream_iterator<char>(out), *rd->resume_data);
-    out.flush();
+    QByteArray data;
+    data.resize(1000000);
+    QFile file(settingsPath + main->torrent->get_torrent_info().name().c_str() + ".fastresume");
+    file.open(QIODevice::WriteOnly);
+    bencode(data.begin(), *rd->resume_data);
+    file.write(data);
+    file.close();
 
     qDebug() << resumeName;
     QFile fout(settingsPath + resumeName + ".qlivebittorrent");

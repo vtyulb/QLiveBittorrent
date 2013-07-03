@@ -10,12 +10,15 @@
 
 #include <curses.h>
 #include <map>
+#include <iostream>
+
 #include <constants.h>
 
 #include <libtorrent/session.hpp>
 #include <libtorrent/add_torrent_params.hpp>
 #include <libtorrent/entry.hpp>
 #include <libtorrent/alert_types.hpp>
+#include <libtorrent/bencode.hpp>
 
 using libtorrent::add_torrent_params;
 using libtorrent::torrent_info;
@@ -34,6 +37,7 @@ public:
 private:
     libtorrent::session *session;
     std::map<std::string, QString> torrentNames;
+    std::map<std::string, QString> fastResumeNames;
 
     void findTorrents();
     void addTorrent(QString);

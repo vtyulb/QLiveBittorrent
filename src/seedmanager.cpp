@@ -16,11 +16,13 @@ SeedManager::SeedManager(QObject *parent) :
     QObject::connect(checkForErrorsTimer, SIGNAL(timeout()), this, SLOT(checkForErrors()));
     checkForErrorsTimer->start();
 
+    QTimer::singleShot(3000, this, SLOT(deleteLater()));
     initscr();
 }
 
 SeedManager::~SeedManager() {
-    /*std::vector<torrent_handle> v = session->get_torrents();
+    endwin();
+    std::vector<torrent_handle> v = session->get_torrents();
     for (int i = 0; i < v.size(); i++) {
         std::deque<alert *> trash;
         session->pop_alerts(&trash);
@@ -37,18 +39,15 @@ SeedManager::~SeedManager() {
         if (rd == 0)
             qDebug() << "Very big fail";
 
+        QByteArray data;
+        data.resize(1000000);
+        bencode(data.begin(), *rd->resume_data);
 
-        std::ofstream out((settingsPath + v[i].get_torrent_info().name().c_str() + ".fastresume").toLocal8Bit(), std::ios_base::binary);
-        bencode(std::ostream_iterator<char>(out), *rd->resume_data);
-        out.flush();
-
-        qDebug() << resumeName;
-        QFile fout(settingsPath + resumeName + ".qlivebittorrent");
-        fout.open(QIODevice::WriteOnly);
-        QTextStream cout(&fout);
-        cout << resumeTorrentName << "\n" << resumeSavePath << "\n" << resumeName + ".fastresume" << "\n";
-        cout.flush();
-    }*/
+        QFile file(settingsPath + v[i].get_torrent_info().name().c_str() + ".fastresume");
+        file.open(QIODevice::WriteOnly);
+        file.write(data);
+        file.close();
+    }
 }
 
 void SeedManager::findTorrents() {
@@ -73,8 +72,6 @@ void SeedManager::addTorrent(QString torrent) {
         p.save_path = (savePath + QString::fromStdString(inf->name()) + "/").toStdString();
         p.ti = inf;
 
-
-
         QFile resumeData(settingsPath + fastResume);
         resumeData.open(QIODevice::ReadOnly);
         std::vector<char> *v = new std::vector<char>;
@@ -86,7 +83,9 @@ void SeedManager::addTorrent(QString torrent) {
         p.resume_data = v;
         p.upload_mode = true;
 
-        torrentNames[session->add_torrent(p).name()] = torrent;
+        const libtorrent::torrent_handle h = session->add_torrent(p);
+        torrentNames[h.name()] = torrent;
+        fastResumeNames[h.name()] = torrent;
     }
 }
 

@@ -59,7 +59,6 @@ int main(int argc, char *argv[])
     if (vm.count("help"))
         showHelp();
 
-    qDebug() << QString::fromStdString(torrent) << QString::fromStdString(downloadPath) << QString::fromStdString(mountPath);
     if (vm.count("seeding-manager")) {
         QCoreApplication a(argc, argv);
         SeedManager manager;
