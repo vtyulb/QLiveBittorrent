@@ -15,6 +15,38 @@ SeedManager::SeedManager(QObject *parent) :
     initscr();
 }
 
+SeedManager::~SeedManager() {
+    /*std::vector<torrent_handle> v = session->get_torrents();
+    for (int i = 0; i < v.size(); i++) {
+        std::deque<alert *> trash;
+        session->pop_alerts(&trash);
+        v[i].save_resume_data();
+        const alert *a = session->wait_for_alert(libtorrent::seconds(3));
+        if (a == NULL)
+            qDebug() << "Can not save resume data";
+
+        std::auto_ptr<alert> holder = session->pop_alert();
+        if (libtorrent::alert_cast<libtorrent::save_resume_data_failed_alert>(a))
+            qDebug() << "Failed alert";
+
+        const libtorrent::save_resume_data_alert *rd = libtorrent::alert_cast<libtorrent::save_resume_data_alert>(a);
+        if (rd == 0)
+            qDebug() << "Very big fail";
+
+
+        std::ofstream out((settingsPath + v[i].get_torrent_info().name().c_str() + ".fastresume").toLocal8Bit(), std::ios_base::binary);
+        bencode(std::ostream_iterator<char>(out), *rd->resume_data);
+        out.flush();
+
+        qDebug() << resumeName;
+        QFile fout(settingsPath + resumeName + ".qlivebittorrent");
+        fout.open(QIODevice::WriteOnly);
+        QTextStream cout(&fout);
+        cout << resumeTorrentName << "\n" << resumeSavePath << "\n" << resumeName + ".fastresume" << "\n";
+        cout.flush();
+    }*/
+}
+
 void SeedManager::findTorrents() {
     QDir dir(settingsPath);
     QFileInfoList list = dir.entryInfoList();
@@ -44,6 +76,7 @@ void SeedManager::addTorrent(QString torrent) {
         v->resize(data.size());
         for (int i = 0; i < data.size(); i++)
             (*v)[i] = data[i];
+        p.flags = add_torrent_params::flag_seed_mode;
         p.resume_data = v;
 
         session->add_torrent(p);
