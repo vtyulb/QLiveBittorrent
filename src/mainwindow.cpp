@@ -38,9 +38,16 @@ MainWindow::~MainWindow() {
 
     QByteArray data;
     data.resize(1000000);
+    data.fill(0);
     QFile file(settingsPath + main->torrent->get_torrent_info().name().c_str() + ".fastresume");
     file.open(QIODevice::WriteOnly);
     bencode(data.begin(), *rd->resume_data);
+    for (int i = 1000000; i > 0; i--)
+        if (data[i] != 0) {
+            data.resize(i - 1);
+            break;
+        }
+
     file.write(data);
     file.close();
 

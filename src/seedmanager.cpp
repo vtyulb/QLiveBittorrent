@@ -16,7 +16,6 @@ SeedManager::SeedManager(QObject *parent) :
     QObject::connect(checkForErrorsTimer, SIGNAL(timeout()), this, SLOT(checkForErrors()));
     checkForErrorsTimer->start();
 
-    QTimer::singleShot(3000, this, SLOT(deleteLater()));
     initscr();
 }
 
@@ -40,14 +39,23 @@ SeedManager::~SeedManager() {
             qDebug() << "Very big fail";
 
         QByteArray data;
-        data.resize(1000000);
+        data.resize(1000001);
+        data.fill(0);
         bencode(data.begin(), *rd->resume_data);
+        for (int i = 1000000; i > 0; i--)
+            if (data[i] != 0) {
+                data.resize(i - 1);
+                break;
+            }
 
         QFile file(settingsPath + v[i].get_torrent_info().name().c_str() + ".fastresume");
         file.open(QIODevice::WriteOnly);
         file.write(data);
         file.close();
     }
+
+    session->pause();
+    delete session;
 }
 
 void SeedManager::findTorrents() {
