@@ -42,10 +42,10 @@ inline QString setStringSize(QString s, int size, bool setBorder = false) {
         s = s.left(size);
 
     int len = s.length();
-    for (int i = 0; i < (size - len) / 2; i++)
+    for (int i = 0; i < (size - len + 1) / 2; i++)
         s = ' ' + s;
 
-    for (int i = 0; i < (size - len + 1) / 2; i++)
+    for (int i = 0; i < (size - len) / 2; i++)
         s = s + ' ';
 
     if (setBorder)

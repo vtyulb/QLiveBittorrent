@@ -3,7 +3,6 @@
 SeedManager::SeedManager(QObject *parent) :
     QObject(parent)
 {
-    qDebug() << "constuct";
     session = new libtorrent::session;
     findTorrents();
 
@@ -11,6 +10,11 @@ SeedManager::SeedManager(QObject *parent) :
     timer->setInterval(1000);
     QObject::connect(timer, SIGNAL(timeout()), this, SLOT(updateInform()));
     timer->start();
+
+    QTimer *checkForErrorsTimer = new QTimer;
+    checkForErrorsTimer->setInterval(120000);
+    QObject::connect(checkForErrorsTimer, SIGNAL(timeout()), this, SLOT(checkForErrors()));
+    checkForErrorsTimer->start();
 
     initscr();
 }
@@ -69,6 +73,8 @@ void SeedManager::addTorrent(QString torrent) {
         p.save_path = (savePath + QString::fromStdString(inf->name()) + "/").toStdString();
         p.ti = inf;
 
+
+
         QFile resumeData(settingsPath + fastResume);
         resumeData.open(QIODevice::ReadOnly);
         std::vector<char> *v = new std::vector<char>;
@@ -78,8 +84,9 @@ void SeedManager::addTorrent(QString torrent) {
             (*v)[i] = data[i];
         p.flags = add_torrent_params::flag_seed_mode;
         p.resume_data = v;
+        p.upload_mode = true;
 
-        session->add_torrent(p);
+        torrentNames[session->add_torrent(p).name()] = torrent;
     }
 }
 
@@ -99,4 +106,20 @@ void SeedManager::updateInform() {
     }
 
     refresh();
+}
+
+void SeedManager::checkForErrors() {
+    std::vector<libtorrent::torrent_handle> v = session->get_torrents();
+    for (int i = 0; i < v.size(); i++)
+        if (v[i].status().paused) {
+            QFile file(settingsPath + "qlivebittorrent.log");
+            file.open(QIODevice::Append);
+            QTextStream cout(&file);
+            cout << "Torrent " << QString::fromStdString(v[i].name()) << "deleted because of "
+                 << QString::fromStdString(v[i].status().error);
+            cout.flush();
+            file.close();
+
+            QFile::rename(torrentNames[v[i].name()], torrentNames[v[i].name()] + ".deleted");
+        }
 }

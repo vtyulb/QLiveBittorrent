@@ -9,6 +9,7 @@
 #include <QTimer>
 
 #include <curses.h>
+#include <map>
 #include <constants.h>
 
 #include <libtorrent/session.hpp>
@@ -32,11 +33,13 @@ public:
 
 private:
     libtorrent::session *session;
+    std::map<std::string, QString> torrentNames;
 
     void findTorrents();
     void addTorrent(QString);
 private slots:
     void updateInform();
+    void checkForErrors();
 
 };
 
