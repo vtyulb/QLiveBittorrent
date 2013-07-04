@@ -3,7 +3,12 @@
 
 #include <QTime>
 #include <QString>
+#include <QFile>
+#include <QVector>
+
 #include <libtorrent/torrent_handle.hpp>
+#include <libtorrent/alert_types.hpp>
+#include <libtorrent/bencode.hpp>
 
 using libtorrent::torrent_status;
 
@@ -51,6 +56,16 @@ inline QString setStringSize(QString s, int size, bool setBorder = false) {
     if (setBorder)
         s = '|' + s + '|';
     return s;
+}
+
+inline QByteArray saveResumeData(const libtorrent::save_resume_data_alert *rd) {
+    QVector<char> data;
+    bencode(std::back_inserter(data), *rd->resume_data);
+
+    QByteArray res(data.size(), 0);
+    for (int i = 0; i < res.size(); i++)
+        res[i] = data[i];
+    return res;
 }
 
 #endif // CONSTANTS_H

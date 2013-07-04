@@ -7,6 +7,8 @@
 #include <QDir>
 #include <QDebug>
 #include <QTimer>
+#include <QApplication>
+#include <QSettings>
 
 #include <curses.h>
 #include <map>
@@ -37,7 +39,6 @@ public:
 private:
     libtorrent::session *session;
     std::map<std::string, QString> torrentNames;
-    std::map<std::string, QString> fastResumeNames;
 
     void findTorrents();
     void addTorrent(QString);

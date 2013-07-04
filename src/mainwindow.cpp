@@ -19,10 +19,11 @@ MainWindow::MainWindow(QString torrent, QString downloadPath, QString mountPath,
 
 MainWindow::~MainWindow() {
     endwin();
+    qDebug() << "destruct";
     session->pause();
     std::deque<alert *> trash;
     session->pop_alerts(&trash);
-    main->torrent->save_resume_data();
+    main->torrent->save_resume_data(torrent_handle::save_info_dict);
     const alert *a = session->wait_for_alert(libtorrent::seconds(3));
     if (a == NULL)
         qDebug() << "Can not save resume data";
@@ -36,30 +37,12 @@ MainWindow::~MainWindow() {
         qDebug() << "Very big fail";
 
 
-    QByteArray data;
-    data.resize(1000000);
-    data.fill(0);
-    QFile file(settingsPath + main->torrent->get_torrent_info().name().c_str() + ".fastresume");
-    file.open(QIODevice::WriteOnly);
-    bencode(data.begin(), *rd->resume_data);
-    for (int i = 1000000; i > 0; i--)
-        if (data[i] != 0) {
-            data.resize(i - 1);
-            break;
-        }
-
-    file.write(data);
-    file.close();
-
-    qDebug() << resumeName;
-    QFile fout(settingsPath + resumeName + ".qlivebittorrent");
-    fout.open(QIODevice::WriteOnly);
-    QTextStream cout(&fout);
-    cout << resumeTorrentName << "\n" << resumeSavePath << "\n" << resumeName + ".fastresume" << "\n";
-    cout.flush();
+    QSettings s(settingsPath + resumeName + ".qlivebittorrent", QSettings::IniFormat);
+    s.setValue("path", QVariant(resumeSavePath));
+    s.setValue("data", saveResumeData(rd));
+    s.sync();
 
     delete session;
-    exit(0);
 }
 
 void MainWindow::initSession(QString rate) {
@@ -126,7 +109,6 @@ void MainWindow::realAddTorrent(QString torrentFile, QString torrentPath, QStrin
     p.ti = inf;
     p.storage_mode = libtorrent::storage_mode_allocate;
 
-    QFile::copy(torrentFile, settingsPath + QFileInfo(QFile(torrentFile)).fileName());
     resumeTorrentName = QFileInfo(QFile(torrentFile)).fileName();
     resumeName = QString::fromStdString(inf->name());
     resumeSavePath = torrentPath;

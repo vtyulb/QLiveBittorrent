@@ -6,12 +6,12 @@ SeedManager::SeedManager(QObject *parent) :
     session = new libtorrent::session;
     findTorrents();
 
-    QTimer *timer = new QTimer;
+    QTimer *timer = new QTimer(this);
     timer->setInterval(1000);
     QObject::connect(timer, SIGNAL(timeout()), this, SLOT(updateInform()));
     timer->start();
 
-    QTimer *checkForErrorsTimer = new QTimer;
+    QTimer *checkForErrorsTimer = new QTimer(this);
     checkForErrorsTimer->setInterval(120000);
     QObject::connect(checkForErrorsTimer, SIGNAL(timeout()), this, SLOT(checkForErrors()));
     checkForErrorsTimer->start();
@@ -21,11 +21,12 @@ SeedManager::SeedManager(QObject *parent) :
 
 SeedManager::~SeedManager() {
     endwin();
+    session->pause();
     std::vector<torrent_handle> v = session->get_torrents();
     for (int i = 0; i < v.size(); i++) {
         std::deque<alert *> trash;
         session->pop_alerts(&trash);
-        v[i].save_resume_data();
+        v[i].save_resume_data(torrent_handle::save_info_dict);
         const alert *a = session->wait_for_alert(libtorrent::seconds(3));
         if (a == NULL)
             qDebug() << "Can not save resume data";
@@ -38,23 +39,11 @@ SeedManager::~SeedManager() {
         if (rd == 0)
             qDebug() << "Very big fail";
 
-        QByteArray data;
-        data.resize(1000001);
-        data.fill(0);
-        bencode(data.begin(), *rd->resume_data);
-        for (int i = 1000000; i > 0; i--)
-            if (data[i] != 0) {
-                data.resize(i - 1);
-                break;
-            }
-
-        QFile file(settingsPath + v[i].get_torrent_info().name().c_str() + ".fastresume");
-        file.open(QIODevice::WriteOnly);
-        file.write(data);
-        file.close();
+        QSettings s(settingsPath + QString::fromStdString(v[i].name()) + ".qlivebittorrent", QSettings::IniFormat);
+        s.setValue("data", QVariant(saveResumeData(rd)));
+        s.sync();
     }
 
-    session->pause();
     delete session;
 }
 
@@ -67,34 +56,14 @@ void SeedManager::findTorrents() {
 }
 
 void SeedManager::addTorrent(QString torrent) {
-    QFile in(settingsPath + torrent);
-    if (!in.open(QIODevice::ReadOnly))
-        qDebug() << "Can not read" << torrent;
-    else {
-        QString torrentName = in.readLine(10000); torrentName = torrentName.left(torrentName.length() - 1);
-        QString savePath = in.readLine(10000);    savePath = savePath.left(savePath.length() - 1);
-        QString fastResume = in.readLine(10000);  fastResume = fastResume.left(fastResume.length() - 1);
+    QSettings s(settingsPath + torrent, QSettings::IniFormat);
+    QByteArray data = s.value("data").toByteArray();
+    libtorrent::entry e = libtorrent::bdecode(data.begin(), data.end());
+    libtorrent::torrent_info *inf = new libtorrent::torrent_info(e);
+    const libtorrent::torrent_handle h =
+           session->add_torrent(inf, (s.value("path").toString() + QString::fromStdString(inf->name()) + "/").toStdString(), e);
 
-        add_torrent_params p;
-        torrent_info *inf = new libtorrent::torrent_info((settingsPath + torrentName).toStdString());
-        p.save_path = (savePath + QString::fromStdString(inf->name()) + "/").toStdString();
-        p.ti = inf;
-
-        QFile resumeData(settingsPath + fastResume);
-        resumeData.open(QIODevice::ReadOnly);
-        std::vector<char> *v = new std::vector<char>;
-        QByteArray data = resumeData.readAll();
-        v->resize(data.size());
-        for (int i = 0; i < data.size(); i++)
-            (*v)[i] = data[i];
-        p.flags = add_torrent_params::flag_seed_mode;
-        p.resume_data = v;
-        p.upload_mode = true;
-
-        const libtorrent::torrent_handle h = session->add_torrent(p);
-        torrentNames[h.name()] = torrent;
-        fastResumeNames[h.name()] = torrent;
-    }
+    torrentNames[h.name()] = torrent;
 }
 
 void SeedManager::updateInform() {
