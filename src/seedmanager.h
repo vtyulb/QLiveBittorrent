@@ -9,6 +9,7 @@
 #include <QTimer>
 #include <QApplication>
 #include <QSettings>
+#include <QSet>
 
 #include <curses.h>
 #include <map>
@@ -39,13 +40,13 @@ public:
 private:
     libtorrent::session *session;
     std::map<std::string, QString> torrentNames;
+    QSet<QString> s;
 
-    void findTorrents();
     void addTorrent(QString);
 private slots:
     void updateInform();
     void checkForErrors();
-
+    void findTorrents();
 };
 
 #endif // SEEDMANAGER_H

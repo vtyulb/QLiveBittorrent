@@ -18,6 +18,11 @@ SeedManager::SeedManager(QObject *parent) :
     QObject::connect(checkForErrorsTimer, SIGNAL(timeout()), this, SLOT(checkForErrors()));
     checkForErrorsTimer->start();
 
+    QTimer *findNewTorrents = new QTimer(this);
+    findNewTorrents->setInterval(600 * 1000);
+    QObject::connect(findNewTorrents, SIGNAL(timeout()), this, SLOT(findTorrents()));
+    findNewTorrents->start();
+
     initscr();
 }
 
@@ -59,8 +64,11 @@ void SeedManager::findTorrents() {
     QDir dir(settingsPath);
     QFileInfoList list = dir.entryInfoList();
     for (int i = 0; i < list.size(); i++)
-        if (list[i].fileName().right(16) == QString(".qlivebittorrent"))
-            addTorrent(list[i].fileName());
+        if (!s.contains(list[i].fileName()))
+            if (list[i].fileName().right(16) == QString(".qlivebittorrent")) {
+                addTorrent(list[i].fileName());
+                s.insert(list[i].fileName());
+            }
 }
 
 void SeedManager::addTorrent(QString torrent) {
