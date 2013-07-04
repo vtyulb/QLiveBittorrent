@@ -19,8 +19,6 @@ MainWindow::MainWindow(QString torrent, QString downloadPath, QString mountPath,
 
 MainWindow::~MainWindow() {
     endwin();
-    qDebug() << "destruct";
-    session->pause();
     std::deque<alert *> trash;
     session->pop_alerts(&trash);
     main->torrent->save_resume_data(torrent_handle::save_info_dict);
@@ -180,6 +178,8 @@ void MainWindow::checkKeys() {
         session->set_download_rate_limit(session->download_rate_limit() + 10000);
     else if (key == '-')
         session->set_download_rate_limit(session->download_rate_limit() - 10000);
+    else if (key == 'q')
+        qApp->quit();
 
     updateStandartText();
     updateInform();

@@ -35,6 +35,7 @@ void sigtermListened(int sig) {
 int main(int argc, char *argv[])
 {
     signal(SIGTERM, sigtermListened);
+    signal(SIGINT, sigtermListened);
 
     std::string torrent;
     std::string downloadPath;
@@ -61,7 +62,7 @@ int main(int argc, char *argv[])
 
     if (vm.count("seeding-manager")) {
         QCoreApplication a(argc, argv);
-        SeedManager manager;
+        SeedManager manager(&a);
         return a.exec();
     } else if (vm.count("gui")) {
         QApplication a(argc, argv);
