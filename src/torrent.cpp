@@ -41,8 +41,7 @@ Torrent::Torrent(const QString &path, const QString &mount, torrent_handle handl
 void Torrent::umount() {
     QProcess umountProc;
     umountProc.execute("fusermount", umountList);
-    if (!umountProc.waitForFinished(10))
-        qDebug() << "You have a big problem";
+    umountProc.waitForFinished(1000);
 }
 
 Torrent::~Torrent() {

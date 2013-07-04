@@ -22,8 +22,12 @@ void showHelp() {
     printf("\t-g --gui                 - to strart a little GUI Interface\n");
     printf("\t-r --limit-rate int      - to limit downloading rate (in KB)\n");
     printf("\t-s --seeding-manager     - to start seed-manager instead of client\n");
-    printf("\t-h --help                - to view this help\n");
-    printf("For example: qlivebittorrent -t example.torrent -d downloadsdir -m mountdir -r 200\n\n");
+    printf("\t-h --help                - to view this help\n\n");
+    printf("In interactive mode there are several available keys:\n");
+    printf("\t'+' - For increasing download rate limit(+10KB)\n");
+    printf("\t'-' - For decreasing download rate limit(-10KB)\n");
+    printf("\t'q' - For quit\n\n");
+    printf("For example: qlivebittorrent -t example.torrent -d downloadsdir -m mountdir -r 200\n");
 
     exit(0);
 }
@@ -64,13 +68,16 @@ int main(int argc, char *argv[])
         QCoreApplication a(argc, argv);
         SeedManager manager(&a);
         return a.exec();
-    } else if (vm.count("gui")) {
+    } else if (vm.count("gui") || !QFile::exists(QString::fromStdString(torrent))) {
+        if ((vm.count("gui") == 0) && (!QFile::exists(QString::fromStdString(torrent))))
+            printf("You specify a valid torrent file\n");
+
         QApplication a(argc, argv);
-        MainWindow w(QString::fromStdString(torrent), QString::fromStdString(downloadPath), QString::fromStdString(mountPath), QString::fromStdString(rate), vm.count("gui"), &a);
+        MainWindow w(QString::fromStdString(torrent), QString::fromStdString(downloadPath), QString::fromStdString(mountPath), QString::fromStdString(rate), true, &a);
         return a.exec();
     } else {
         QCoreApplication a(argc, argv);
-        MainWindow w(QString::fromStdString(torrent), QString::fromStdString(downloadPath), QString::fromStdString(mountPath), QString::fromStdString(rate), vm.count("gui"), &a);
+        MainWindow w(QString::fromStdString(torrent), QString::fromStdString(downloadPath), QString::fromStdString(mountPath), QString::fromStdString(rate), false, &a);
         return a.exec();
     }
 }
