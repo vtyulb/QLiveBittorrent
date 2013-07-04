@@ -9,7 +9,7 @@ TODO:
 http protocol (maybe)
 
 Current status of program:
-I tested it on archlinux, by downloading 1.45G file on 8Mbit channel - it works good.
+I tested it on archlinux, by downloading 1.45G file on 3Mbit channel - it works good.
 If you want to test it, you should understand that my program is not a god, so piece,
 which you want to see can be downloaded with a big delay.
 
