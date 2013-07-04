@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
         return a.exec();
     } else if (vm.count("gui") || !QFile::exists(QString::fromStdString(torrent))) {
         if ((vm.count("gui") == 0) && (!QFile::exists(QString::fromStdString(torrent))))
-            printf("You specify a valid torrent file\n");
+            printf("You must specify a valid torrent file (or --gui)\n");
 
         QApplication a(argc, argv);
         MainWindow w(QString::fromStdString(torrent), QString::fromStdString(downloadPath), QString::fromStdString(mountPath), QString::fromStdString(rate), true, &a);
