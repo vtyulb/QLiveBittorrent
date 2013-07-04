@@ -64,6 +64,9 @@ void SeedManager::addTorrent(QString torrent) {
            session->add_torrent(inf, (s.value("path").toString() + QString::fromStdString(inf->name()) + "/").toStdString(), e);
 
     h.set_upload_mode(true);
+    if (h.is_paused())
+        h.resume();
+
     torrentNames[h.name()] = torrent;
 }
 
