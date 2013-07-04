@@ -4,6 +4,7 @@ SeedManager::SeedManager(QObject *parent) :
     QObject(parent)
 {
     session = new libtorrent::session;
+    session->listen_on(std::make_pair(6881, 6889));
     findTorrents();
 
     QTimer *timer = new QTimer(this);
@@ -96,11 +97,12 @@ void SeedManager::checkForErrors() {
             QFile file(settingsPath + "qlivebittorrent.log");
             file.open(QIODevice::Append);
             QTextStream cout(&file);
-            cout << "Torrent " << QString::fromStdString(v[i].name()) << "deleted because of "
+            cout << "Torrent " << QString::fromStdString(v[i].name()) << " deleted because of "
                  << QString::fromStdString(v[i].status().error);
             cout.flush();
             file.close();
 
+            session->remove_torrent(v[i]);
             QFile::rename(torrentNames[v[i].name()], torrentNames[v[i].name()] + ".deleted");
         }
 }
