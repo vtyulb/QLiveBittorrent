@@ -81,7 +81,7 @@ void SeedManager::updateInform() {
                setStringSize(QString::number(i), 2).toLocal8Bit().constData(),
                setStringSize(QString::fromStdString(v[i].name()), 20).toLocal8Bit().constData(),
                setStringSize(QString::number(v[i].status().upload_payload_rate / 1000), 18).toLocal8Bit().constData(),
-               setStringSize(QString::number(v[i].status().total_payload_upload / 1000000), 12).toLocal8Bit().constData(),
+               setStringSize(QString::number(v[i].status().all_time_upload / 1000000), 12).toLocal8Bit().constData(),
                setStringSize(QString::number(v[i].get_torrent_info().total_size() / 1000000), 8).toLocal8Bit().constData());
         printw("%s|\n", setStringSize(getNormalStatus(v[i].status().state), 11).toLocal8Bit().constData());
     }
