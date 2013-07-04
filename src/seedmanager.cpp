@@ -36,12 +36,16 @@ SeedManager::~SeedManager() {
         }
 
         std::auto_ptr<alert> holder = session->pop_alert();
-        if (libtorrent::alert_cast<libtorrent::save_resume_data_failed_alert>(a))
+        if (libtorrent::alert_cast<libtorrent::save_resume_data_failed_alert>(a)) {
             qDebug() << "Failed alert";
+            break;
+        }
 
         const libtorrent::save_resume_data_alert *rd = libtorrent::alert_cast<libtorrent::save_resume_data_alert>(a);
-        if (rd == 0)
+        if (rd == 0) {
             qDebug() << "Very big fail";
+            break;
+        }
 
         QSettings s(settingsPath + QString::fromStdString(v[i].name()) + ".qlivebittorrent", QSettings::IniFormat);
         s.setValue("data", QVariant(saveResumeData(rd)));

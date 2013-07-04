@@ -23,17 +23,22 @@ MainWindow::~MainWindow() {
     session->pop_alerts(&trash);
     main->torrent->save_resume_data(torrent_handle::save_info_dict);
     const alert *a = session->wait_for_alert(libtorrent::seconds(3));
-    if (a == NULL)
+    if (a == NULL) {
         qDebug() << "Can not save resume data";
+        exit(1);
+    }
 
     std::auto_ptr<alert> holder = session->pop_alert();
-    if (libtorrent::alert_cast<libtorrent::save_resume_data_failed_alert>(a))
+    if (libtorrent::alert_cast<libtorrent::save_resume_data_failed_alert>(a)) {
         qDebug() << "Failed alert";
+        exit(1);
+    }
 
     const libtorrent::save_resume_data_alert *rd = libtorrent::alert_cast<libtorrent::save_resume_data_alert>(a);
-    if (rd == 0)
+    if (rd == 0) {
         qDebug() << "Very big fail";
-
+        exit(1);
+    }
 
     QSettings s(settingsPath + resumeName + ".qlivebittorrent", QSettings::IniFormat);
     s.setValue("path", QVariant(resumeSavePath));
