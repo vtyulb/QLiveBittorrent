@@ -70,14 +70,15 @@ void SeedManager::updateInform() {
     erase();
     std::vector<libtorrent::torrent_handle> v = session->get_torrents();
 
-    printw("%s\n", ("/ №|" + setStringSize("Name", 20) + "|Upload speed(KB/s)|Uploaded(MB)|Size(MB)|" + setStringSize("state", 11) + "\\").toLocal8Bit().constData());
+    printw("%s\n", ("/ №|" + setStringSize("Name", 20) + "|Upload speed(KB/s)|Uploaded(MB)|Size(MB)|" +
+                   setStringSize("state", 11) + "\\").toLocal8Bit().constData());
     for (int i = 0; i < v.size(); i++) {
-        printw("%s%s%s%s%s",
-               setStringSize(QString::number(i), 2, true).toLocal8Bit().constData(),
+        printw("|%s|%s|%s|%s|%s|",
+               setStringSize(QString::number(i), 2).toLocal8Bit().constData(),
                setStringSize(QString::fromStdString(v[i].name()), 20).toLocal8Bit().constData(),
-               setStringSize(QString::number(v[i].status().upload_payload_rate / 1000), 18, true).toLocal8Bit().constData(),
+               setStringSize(QString::number(v[i].status().upload_payload_rate / 1000), 18).toLocal8Bit().constData(),
                setStringSize(QString::number(v[i].status().total_payload_upload / 1000000), 12).toLocal8Bit().constData(),
-               setStringSize(QString::number(v[i].get_torrent_info().total_size() / 1000000), 8, true).toLocal8Bit().constData());
+               setStringSize(QString::number(v[i].get_torrent_info().total_size() / 1000000), 8).toLocal8Bit().constData());
         printw("%s|\n", setStringSize(getNormalStatus(v[i].status().state), 11).toLocal8Bit().constData());
     }
 

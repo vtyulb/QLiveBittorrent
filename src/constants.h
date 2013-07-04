@@ -42,7 +42,7 @@ inline QString getNormalStatus(libtorrent::torrent_status::state_t status) {
         return "Calculating first 1000000000! digits of PI\n";
 }
 
-inline QString setStringSize(QString s, int size, bool setBorder = false) {
+inline QString setStringSize(QString s, int size) {
     if (s.length() > size)
         s = s.left(size);
 
@@ -52,9 +52,6 @@ inline QString setStringSize(QString s, int size, bool setBorder = false) {
 
     for (int i = 0; i < (size - len) / 2; i++)
         s = s + ' ';
-
-    if (setBorder)
-        s = '|' + s + '|';
     return s;
 }
 
