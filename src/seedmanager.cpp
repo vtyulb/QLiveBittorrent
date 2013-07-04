@@ -5,6 +5,7 @@ SeedManager::SeedManager(QObject *parent) :
 {
     session = new libtorrent::session;
     session->listen_on(std::make_pair(6881, 6889));
+    session->set_alert_mask(0);
     findTorrents();
 
     QTimer *timer = new QTimer(this);
@@ -29,8 +30,10 @@ SeedManager::~SeedManager() {
         session->pop_alerts(&trash);
         v[i].save_resume_data(torrent_handle::save_info_dict);
         const alert *a = session->wait_for_alert(libtorrent::seconds(3));
-        if (a == NULL)
+        if (a == NULL) {
             qDebug() << "Can not save resume data";
+            break;
+        }
 
         std::auto_ptr<alert> holder = session->pop_alert();
         if (libtorrent::alert_cast<libtorrent::save_resume_data_failed_alert>(a))

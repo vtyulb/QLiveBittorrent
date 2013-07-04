@@ -51,6 +51,7 @@ void MainWindow::initSession(QString rate) {
     settings.choking_algorithm = settings.bittyrant_choker;
     session->set_settings(settings);
     session->set_download_rate_limit(rate.toInt() * 1000);
+    session->set_alert_mask(0);
 }
 
 void MainWindow::addTorrent() {
