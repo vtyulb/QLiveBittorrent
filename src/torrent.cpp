@@ -37,6 +37,7 @@ Torrent::Torrent(const QString &path, const QString &mount, torrent_handle handl
     QTimer::singleShot(120000, this, SLOT(lesserPeers()));
     staticReprioritize->start();
     num_pieces = inform.num_pieces();
+    agressive = true;
 }
 
 void Torrent::umount() {
@@ -118,6 +119,9 @@ bool Torrent::checkForDownload(int start, int end) {
 }
 
 void Torrent::staticRecall() {
+    if (!agressive)
+        return;
+
     int i;
     libtorrent::bitfield bit = torrent->status().pieces;
     if (bit.size() < num_pieces)
@@ -137,11 +141,21 @@ void Torrent::lesserPeers() {
     torrent->set_max_connections(5);
 }
 
+void Torrent::invertAgressive() {
+    if (agressive) {
+        for (int i = 0; i < num_pieces; i++)
+            torrent->reset_piece_deadline(i);
+
+        torrent->set_max_connections(30);
+    } else
+        torrent->set_max_connections(6);
+
+    agressive = !agressive;
+
+}
+
 void Torrent::waitForMetadata(const torrent_handle *handle) {
     qDebug() << "Waiting for metadata";
-    while (!handle->has_metadata()) {
-        QEventLoop loop;
-        QTimer::singleShot(100, &loop, SLOT(quit()));
-        loop.exec();
-    }
+    while (!handle->has_metadata())
+        sleep(100);
 }

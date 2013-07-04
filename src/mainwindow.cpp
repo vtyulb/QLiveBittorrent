@@ -158,6 +158,8 @@ void MainWindow::updateInform() {
     libtorrent::torrent_status status = main->torrent->status();
     libtorrent::torrent_info info = main->torrent->get_torrent_info();
     printw("%s", standartText.constData());
+    if (!main->agressive)
+        printw("Not agressive piece picking\n");
     printw("%d of %d peers connected; %d of %d MB downloaded; progress - %d\%; d - %dKB/s; u - %dKB/s\n",
            status.num_connections, status.list_seeds + status.list_peers, int((info.total_size() / 1000000) * status.progress),
            info.total_size() / 1000000, int(status.progress * 100), status.download_rate / 1000, status.upload_rate / 1000);
@@ -203,6 +205,8 @@ void MainWindow::checkKeys() {
         session->set_download_rate_limit(session->download_rate_limit() - 10000);
     else if (key == 'q')
         qApp->quit();
+    else if (key == 'a')
+        main->invertAgressive();
 
     updateStandartText();
     updateInform();

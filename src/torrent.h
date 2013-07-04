@@ -35,6 +35,8 @@ public:
     static void sleep(int ms);
     torrent_handle *torrent;
     int lastAsk;
+    bool agressive;
+    void invertAgressive();
     QTime *lastAskTime;
 
 private:
