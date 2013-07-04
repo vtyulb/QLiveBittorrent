@@ -65,4 +65,8 @@ inline QByteArray saveResumeData(const libtorrent::save_resume_data_alert *rd) {
     return res;
 }
 
+inline bool isMagnet(QString s) {
+    return s.left(8) == QString("magnet:?");
+}
+
 #endif // CONSTANTS_H

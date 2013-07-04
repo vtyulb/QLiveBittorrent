@@ -41,6 +41,7 @@ private:
     QProcess *mountProcess;
     long long readInt(const QString &s);
     void waitForDownload(int start, int end);
+    void waitForMetadata(const torrent_handle *handle);
     bool checkForDownload(int start, int end);
     void umount();
     int num_pieces;

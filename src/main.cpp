@@ -64,11 +64,13 @@ int main(int argc, char *argv[])
     if (vm.count("help"))
         showHelp();
 
+    bool magnet = isMagnet(QString::fromStdString(torrent));
+
     if (vm.count("seeding-manager")) {
         QCoreApplication a(argc, argv);
         SeedManager manager(&a);
         return a.exec();
-    } else if (vm.count("gui") || !QFile::exists(QString::fromStdString(torrent))) {
+    } else if (vm.count("gui") || (!QFile::exists(QString::fromStdString(torrent)) && !magnet)) {
         if ((vm.count("gui") == 0) && (!QFile::exists(QString::fromStdString(torrent))))
             printf("You must specify a valid torrent file (or --gui)\n");
 

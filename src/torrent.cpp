@@ -8,6 +8,7 @@ Torrent::Torrent(const QString &path, const QString &mount, torrent_handle handl
     tmp.mkdir(mount);
     torrent = new torrent_handle(handle);
     torrent->set_max_connections(15);
+    waitForMetadata(torrent);
 
     name = QString::fromStdString(handle.name());
     torrent_info inform = handle.get_torrent_info();
@@ -134,4 +135,13 @@ void Torrent::staticRecall() {
 
 void Torrent::lesserPeers() {
     torrent->set_max_connections(5);
+}
+
+void Torrent::waitForMetadata(const torrent_handle *handle) {
+    qDebug() << "Waiting for metadata";
+    while (!handle->has_metadata()) {
+        QEventLoop loop;
+        QTimer::singleShot(100, &loop, SLOT(quit()));
+        loop.exec();
+    }
 }

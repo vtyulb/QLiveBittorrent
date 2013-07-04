@@ -14,6 +14,7 @@
 #include <QApplication>
 #include <QTime>
 #include <QFileInfo>
+#include <QUrl>
 
 #include <torrent.h>
 #include <generateimage.h>
@@ -30,13 +31,14 @@
 #include "libtorrent/lazy_entry.hpp"
 #include "libtorrent/session.hpp"
 #include "libtorrent/alert_types.hpp"
+#include "libtorrent/magnet_uri.hpp"
 #include "boost/filesystem/operations.hpp"
 #include "curses.h"
 
 using libtorrent::torrent_info;
 using libtorrent::torrent_handle;
 using libtorrent::torrent_status;
-using libtorrent::add_torrent_params;\
+using libtorrent::add_torrent_params;
 using libtorrent::alert;
 using libtorrent::bencode;
 
@@ -57,9 +59,7 @@ private:
     unsigned int standartTextLen;
     Torrent *main;
 
-    QString resumeTorrentName;
     QString resumeSavePath;
-    QString resumeName;
 
     void initSession(QString rate);
     void findPaths(QString torrent);

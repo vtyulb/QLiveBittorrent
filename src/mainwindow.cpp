@@ -40,7 +40,7 @@ MainWindow::~MainWindow() {
         exit(1);
     }
 
-    QSettings s(settingsPath + resumeName + ".qlivebittorrent", QSettings::IniFormat);
+    QSettings s(settingsPath + QString::fromStdString(main->torrent->name()) + ".qlivebittorrent", QSettings::IniFormat);
     s.setValue("path", QVariant(resumeSavePath));
     s.setValue("data", saveResumeData(rd));
     s.sync();
@@ -62,7 +62,7 @@ void MainWindow::initSession(QString rate) {
 void MainWindow::addTorrent() {
     QString torrent = QFileDialog::getOpenFileName(fake, QString(), QString(),
                                                    QString("*.torrent"));
-    if (QFile(torrent).exists())
+    if (QFile(torrent).exists() || isMagnet(torrent))
         findPaths(torrent);
     else
         die("User don't choose torrent file");
@@ -96,7 +96,7 @@ void MainWindow::updateStandartText() {
 }
 
 void MainWindow::realAddTorrent(QString torrentFile, QString torrentPath, QString mountPath) {
-    if (!QFile::exists(torrentFile))
+    if (!QFile::exists(torrentFile) && !isMagnet(torrentFile))
         die("torrent file not found");
 
     standartText = ("Torrent file: " + torrentFile + "\nDownload path: " + torrentPath + "\nMount path: " + mountPath + "\n").toLocal8Bit();
@@ -107,17 +107,34 @@ void MainWindow::realAddTorrent(QString torrentFile, QString torrentPath, QStrin
         torrentPath += "/";
     if (mountPath[mountPath.length() - 1] != QChar('/'))
         mountPath += "/";
-    add_torrent_params p;
-    torrent_info *inf = new libtorrent::torrent_info(torrentFile.toStdString());
-    p.save_path = (torrentPath + QString::fromStdString(inf->name()) + "/").toStdString();
-    p.ti = inf;
-    p.storage_mode = libtorrent::storage_mode_allocate;
 
-    resumeTorrentName = QFileInfo(QFile(torrentFile)).fileName();
-    resumeName = QString::fromStdString(inf->name());
     resumeSavePath = torrentPath;
 
-    main = new Torrent(torrentPath + QString::fromStdString(inf->name()), mountPath + QString::fromStdString(inf->name()), session->add_torrent(p), this);
+    add_torrent_params p;
+    p.storage_mode = libtorrent::storage_mode_allocate;
+
+    if (isMagnet(torrentFile)) {
+        int i;
+        for (i = 1; torrentFile[i] != '='; i++);
+        for (i = i + 1; torrentFile[i] != '='; i++);
+
+        QString url;
+        for (i = i + 1; torrentFile[i] != '&'; i++)
+            url += torrentFile[i];
+
+        QString name = QUrl(url).toString(QUrl::PreferLocalFile).replace("+", " ");
+
+        p.save_path = (torrentPath + name + "/").toStdString();
+
+        const torrent_handle h = libtorrent::add_magnet_uri(*session, torrentFile.toStdString(), p);
+        main = new Torrent(torrentPath + QString::fromStdString(h.name()), mountPath + QString::fromStdString(h.name()), h, this);
+    } else {
+        torrent_info *inf = new libtorrent::torrent_info(torrentFile.toStdString());
+        p.ti = inf;
+        p.save_path = (torrentPath + QString::fromStdString(inf->name()) + "/").toStdString();
+        main = new Torrent(torrentPath + QString::fromStdString(inf->name()), mountPath + QString::fromStdString(inf->name()), session->add_torrent(p), this);
+    }
+
     setupTimers();
 }
 
