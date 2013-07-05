@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Qlivebittorrent : Bittorrent client with function reading files before they would be downloaded" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Qlivebittorrent</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/vtyulb/QLiveBittorrent">View on GitHub</a>
+
+          <h1 id="project_title">Qlivebittorrent</h1>
+          <h2 id="project_tagline">Bittorrent client with function reading files before they would be downloaded</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/vtyulb/QLiveBittorrent/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/vtyulb/QLiveBittorrent/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a name="qlivebittorrent" class="anchor" href="#qlivebittorrent"><span class="octicon octicon-link"></span></a>QLiveBittorrent</h1>
+
+<p>Bittorrent client with function reading files before they would be downloaded
+Compile driver.c with string: gcc -g <code>pkg-config fuse --cflags --libs</code> driver.c -o qlivebittorrent-driver</p>
+
+<p>TODO:
+http protocol (maybe); web-interface</p>
+
+<p>Current status of program:
+I tested it on archlinux, by downloading 1.45G file on 3Mbit channel - it works good.
+If you want to test it, you should understand that my program is not a god, so piece,
+which you want to see can be downloaded with a big delay.</p>
+
+<p>Plus and Minus keys - to increase/decrease download rate limit.
+'q' - for exit;
+'a' - to switch agressive/non-agressive piece picking;</p>
+
+<p>GPL License</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Qlivebittorrent maintained by <a href="https://github.com/vtyulb">vtyulb</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
