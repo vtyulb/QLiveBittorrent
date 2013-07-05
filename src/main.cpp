@@ -18,7 +18,7 @@ void showHelp() {
     printf("Usage: qlivebittorrent (-t string) (-d string) [-m string] [-r int]\n");
     printf("   or: qlivebittorrent [-t string] (-g | --gui) [-r | --limit-rate int]\n");
     printf("   or: qlivebittorrent -s | --seeding-manager\n");
-    printf("\t-t --torrent string      - name of *.torrent file\n");
+    printf("\t-t --torrent string      - name of *.torrent file or magnet link\n");
     printf("\t-d --downloadpath string - name of folder to download files\n");
     printf("\t-m --mount string        - name of folder to mount files from torrent\n");
     printf("\t-g --gui                 - to strart a little GUI Interface\n");
@@ -29,6 +29,7 @@ void showHelp() {
     printf("\t'+' - For increasing download rate limit(+10KB)\n");
     printf("\t'-' - For decreasing download rate limit(-10KB)\n");
     printf("\t'q' - For quit\n\n");
+    printf("\t'a' - For disable/enable agressive piece picking\n");
     printf("For example: qlivebittorrent -t example.torrent -d downloadsdir -m mountdir -r 200\n");
 
     exit(0);

@@ -23,6 +23,7 @@ Torrent::Torrent(const QString &path, const QString &mount, torrent_handle handl
     QStringList params;
     params << "-s"; //single-threaded
     params << "-f"; //force don't know what
+    params << "-q"; //quiet
     params << mount;
     params << path;
     mountProcess->start(driver, params);
