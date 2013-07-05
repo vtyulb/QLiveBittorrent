@@ -134,13 +134,13 @@ void SeedManager::checkForErrors() {
             QFile file(settingsPath + "qlivebittorrent.log");
             file.open(QIODevice::Append);
             QTextStream cout(&file);
-            cout << "Torrent " << QString::fromStdString(v[i].name()) << " deleted because of "
-                 << QString::fromStdString(v[i].status().error);
+            cout << "Torrent " << QString::fromStdString(v[i].name()) << " deleted because of\n"
+                 << QString::fromStdString(v[i].status().error) << "\n----------------";
             cout.flush();
             file.close();
 
             session->remove_torrent(v[i]);
-            QFile::rename(torrentNames[v[i].name()], torrentNames[v[i].name()] + ".deleted");
+            QFile::rename(settingsPath + torrentNames[v[i].name()], settingsPath + torrentNames[v[i].name()] + ".deleted");
         }
 }
 
