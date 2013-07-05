@@ -20,7 +20,7 @@ MainWindow::MainWindow(QString torrent, QString downloadPath, QString mountPath,
 MainWindow::~MainWindow() {
     endwin();
     qDebug() << "saving information about torrent";
-    if (!main->torrent->is_valid() || (main->torrent->status().progress < 0.5))
+    if ((main == NULL) || (!main->torrent->is_valid() || (main->torrent->status().progress < 0.5)))
         return;
     std::deque<alert *> trash;
     session->pop_alerts(&trash);
