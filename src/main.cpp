@@ -23,7 +23,7 @@ void showHelp() {
     printf("\t-d --downloadpath string - name of folder to download files\n");
     printf("\t-m --mount string        - name of folder to mount files from torrent\n");
     printf("\t-g --gui                 - to strart a little GUI Interface\n");
-    printf("\t-r --limit-rate int      - to limit downloading rate (in KB)\n");
+    printf("\t-r --limit-rate int      - to limit download (or upload for -s) rate (in KB)\n");
     printf("\t-s --seeding-manager     - to start seed-manager instead of client\n");
     printf("\t-h --help                - to view this help\n\n");
     printf("In interactive mode there are several available keys:\n");
@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
 
     if (vm.count("seeding-manager")) {
         QCoreApplication a(argc, argv);
-        SeedManager manager(&a);
+        SeedManager manager(QString::fromStdString(rate), &a);
         c = &manager;
         return a.exec();
     } else if (vm.count("gui") || (!QFile::exists(QString::fromStdString(torrent)) && !magnet)) {

@@ -1,11 +1,12 @@
 #include "seedmanager.h"
 
-SeedManager::SeedManager(QObject *parent) :
+SeedManager::SeedManager(QString rate, QObject *parent) :
     QObject(parent)
 {
     session = new libtorrent::session;
     session->listen_on(std::make_pair(6881, 6889));
     session->set_alert_mask(0);
+    session->set_upload_rate_limit(rate.toInt() * 1000);
     findTorrents();
 
     QTimer *timer = new QTimer(this);
@@ -116,11 +117,12 @@ void SeedManager::updateInform() {
         if (firstDisplayingTorrent)
             printw("Arrows to navigate(up and down)\n");
         else
-            printw("Arrows to navigate (only down)");
+            printw("Arrows to navigate (only down)\n");
     else if (firstDisplayingTorrent)
-        printw("Arrow to navigate(only up)");
+        printw("Arrow to navigate(only up)\n");
 
-
+    if (session->upload_rate_limit() != 0)
+        printw("Upload rate limit: %d", session->upload_rate_limit() / 1000);
 
     refresh();
 }
@@ -160,6 +162,10 @@ void SeedManager::checkKeys() {
                                 numberDisplayingTorrents()), firstDisplayingTorrent + 1);
     else if (key == KEY_UP)
         firstDisplayingTorrent = max(0, firstDisplayingTorrent - 1);
+    else if (key == '+')
+        session->set_upload_rate_limit(session->upload_rate_limit() + 10000);
+    else if (key == '-')
+        session->set_upload_rate_limit(session->upload_rate_limit() - 10000);
 
     updateInform();
 }

@@ -38,7 +38,7 @@ class SeedManager : public QObject, public AbstractSeedingClass
 {
     Q_OBJECT
 public:
-    explicit SeedManager(QObject *parent = 0);
+    explicit SeedManager(QString rate, QObject *parent = 0);
     ~SeedManager();
     bool informationSaved();
 
