@@ -28,7 +28,7 @@ SeedManager::SeedManager(QObject *parent) :
 
 SeedManager::~SeedManager() {
     endwin();
-    session->pause();
+    qDebug() << "saving information about torrent";
     std::vector<torrent_handle> v = session->get_torrents();
     for (int i = 0; i < v.size(); i++) {
         std::deque<alert *> trash;
@@ -57,6 +57,8 @@ SeedManager::~SeedManager() {
         s.sync();
     }
 
+    qDebug() << "sending information about (upload / download) size to trackers";
+    session->pause();
     delete session;
 }
 

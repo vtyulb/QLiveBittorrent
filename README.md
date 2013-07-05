@@ -14,5 +14,7 @@ If you want to test it, you should understand that my program is not a god, so p
 which you want to see can be downloaded with a big delay.
 
 Plus and Minus keys - to increase/decrease download rate limit.
+'q' - for exit
+'a' - to switch agressive/non-agressive piece picking
 
 GPL License

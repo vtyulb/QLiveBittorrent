@@ -86,10 +86,9 @@ void MainWindow::updateStandartText() {
         text += "Status: ";
         text += getNormalStatus(main->torrent->status().state);
         text += "\n";
+        if (!main->agressive)
+            text += "Non agressive piece picking";
     }
-
-    if (!main->agressive)
-        text += "Non agressive piece picking";
 
     for (int i = 1; i < stdscr->_maxx; i++)
         text += '=';
