@@ -122,7 +122,7 @@ void SeedManager::updateInform() {
         printw("Arrow to navigate(only up)\n");
 
     if (session->upload_rate_limit() != 0)
-        printw("Upload rate limit: %d", session->upload_rate_limit() / 1000);
+        printw("Upload rate limit: %d(KB/s)", session->upload_rate_limit() / 1000);
 
     refresh();
 }

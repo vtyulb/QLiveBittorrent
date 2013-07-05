@@ -18,7 +18,7 @@ void showHelp() {
     printf("Usage: qlivebittorrent (-t string) (-d string) [-m string] [-r int]\n");
     printf("   or: qlivebittorrent [-t string] (-g | --gui) [-r | --limit-rate int]\n");
     printf("   or: qlivebittorrent -s | --seeding-manager\n");
-    printf("   or: qlivebittorrent (torrent | magnet)");
+    printf("   or: qlivebittorrent (torrent | magnet)\n");
     printf("\t-t --torrent string      - name of *.torrent file or magnet link\n");
     printf("\t-d --downloadpath string - name of folder to download files\n");
     printf("\t-m --mount string        - name of folder to mount files from torrent\n");
