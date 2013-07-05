@@ -18,6 +18,7 @@ void showHelp() {
     printf("Usage: qlivebittorrent (-t string) (-d string) [-m string] [-r int]\n");
     printf("   or: qlivebittorrent [-t string] (-g | --gui) [-r | --limit-rate int]\n");
     printf("   or: qlivebittorrent -s | --seeding-manager\n");
+    printf("   or: qlivebittorrent (torrent | magnet)");
     printf("\t-t --torrent string      - name of *.torrent file or magnet link\n");
     printf("\t-d --downloadpath string - name of folder to download files\n");
     printf("\t-m --mount string        - name of folder to mount files from torrent\n");
@@ -48,10 +49,15 @@ int main(int argc, char *argv[])
     signal(SIGTERM, sigtermListened);
     signal(SIGINT, sigtermListened);
 
-    std::string torrent;
+    std::string torrent, bt;
     std::string downloadPath;
     std::string mountPath;
     std::string rate;
+
+    if ((argc == 2) && (argv[1][0] != '-')) {
+        bt = argv[1];
+        argv[1] = "-g";
+    }
 
     po::options_description desc("General options");
     desc.add_options()
@@ -70,6 +76,7 @@ int main(int argc, char *argv[])
 
     if (vm.count("help"))
         showHelp();
+
 
     bool magnet = isMagnet(QString::fromStdString(torrent));
 
