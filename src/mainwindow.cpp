@@ -19,6 +19,7 @@ MainWindow::MainWindow(QString torrent, QString downloadPath, QString mountPath,
 
 MainWindow::~MainWindow() {
     endwin();
+    qDebug() << "saving information about torrent";
     std::deque<alert *> trash;
     session->pop_alerts(&trash);
     main->torrent->save_resume_data(torrent_handle::save_info_dict);
@@ -45,6 +46,7 @@ MainWindow::~MainWindow() {
     s.setValue("data", saveResumeData(rd));
     s.sync();
 
+    qDebug() << "Sending information about (upload/download) sizes to tracker";
     delete session;
 }
 
