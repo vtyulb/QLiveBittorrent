@@ -3,6 +3,9 @@
 
 #include <QDialog>
 #include <QString>
+#include <QSettings>
+#include <QDir>
+#include <constants.h>
 
 namespace Ui {
 class TorrentDialog;
@@ -20,6 +23,7 @@ private:
     QString torrentName;
 private slots:
     void finish();
+    void reject();
 signals:
     void success(QString torrentFile, QString torrentPath, QString mountPath);
     void rejected();
