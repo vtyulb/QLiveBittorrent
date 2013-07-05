@@ -77,6 +77,8 @@ int main(int argc, char *argv[])
     if (vm.count("help"))
         showHelp();
 
+    if (torrent == "")
+        torrent = bt;
 
     bool magnet = isMagnet(QString::fromStdString(torrent));
 
@@ -86,7 +88,7 @@ int main(int argc, char *argv[])
         c = &manager;
         return a.exec();
     } else if (vm.count("gui") || (!QFile::exists(QString::fromStdString(torrent)) && !magnet)) {
-        if ((vm.count("gui") == 0) && (!QFile::exists(QString::fromStdString(torrent))))
+        if ((vm.count("gui") == 0) && (!QFile::exists(QString::fromStdString(torrent))) && !isMagnet(QString::fromStdString(torrent)))
             printf("You must specify a valid torrent file (or --gui)\n");
 
         QApplication a(argc, argv);

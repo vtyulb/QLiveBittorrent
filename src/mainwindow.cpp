@@ -10,7 +10,7 @@ MainWindow::MainWindow(QString torrent, QString downloadPath, QString mountPath,
         realAddTorrent(torrent, downloadPath, mountPath);
     else {
         fake = new QMainWindow;
-        if (QFile(torrent).exists())
+        if (QFile(torrent).exists() || isMagnet(torrent))
             findPaths(torrent);
         else
             addTorrent();
@@ -20,6 +20,8 @@ MainWindow::MainWindow(QString torrent, QString downloadPath, QString mountPath,
 MainWindow::~MainWindow() {
     endwin();
     qDebug() << "saving information about torrent";
+    if (!main->torrent->is_valid() || main->torrent->status().progress < 0.5)
+        return;
     std::deque<alert *> trash;
     session->pop_alerts(&trash);
     main->torrent->save_resume_data(torrent_handle::save_info_dict);
