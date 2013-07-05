@@ -23,7 +23,14 @@ SeedManager::SeedManager(QObject *parent) :
     QObject::connect(findNewTorrents, SIGNAL(timeout()), this, SLOT(findTorrents()));
     findNewTorrents->start();
 
+    QTimer *checkKeys = new QTimer(this);
+    checkKeys->setInterval(10);
+    QObject::connect(checkKeys, SIGNAL(timeout()), this, SLOT(checkKeys()));
+    checkKeys->start();
+
     initscr();
+    nodelay(stdscr, true);
+    keypad(stdscr, true);
 }
 
 SeedManager::~SeedManager() {
@@ -95,15 +102,25 @@ void SeedManager::updateInform() {
 
     printw("%s\n", ("/ №|" + setStringSize("Name", 20) + "|Upload speed(KB/s)|Uploaded(MB)|Size(MB)|" +
                    setStringSize("state", 11) + "\\").toLocal8Bit().constData());
-    for (int i = 0; i < v.size(); i++) {
+    for (int i = firstDisplayingTorrent; i < firstDisplayingTorrent + numberDisplayingTorrents(); i++) {
         printw("|%s|%s|%s|%s|%s|",
-               setStringSize(QString::number(i), 2).toLocal8Bit().constData(),
+               setStringSize(QString::number(i + 1), 2).toLocal8Bit().constData(),
                setStringSize(QString::fromStdString(v[i].name()), 20).toLocal8Bit().constData(),
                setStringSize(QString::number(v[i].status().upload_payload_rate / 1000), 18).toLocal8Bit().constData(),
                setStringSize(QString::number(v[i].status().all_time_upload / 1000000), 12).toLocal8Bit().constData(),
                setStringSize(QString::number(v[i].get_torrent_info().total_size() / 1000000), 8).toLocal8Bit().constData());
         printw("%s|\n", setStringSize(getNormalStatus(v[i].status().state), 11).toLocal8Bit().constData());
     }
+
+    if ((firstDisplayingTorrent + numberDisplayingTorrents() < v.size()))
+        if (firstDisplayingTorrent)
+            printw("Arrows to navigate(up and down)\n");
+        else
+            printw("Arrows to navigate (only down)");
+    else if (firstDisplayingTorrent)
+        printw("Arrow to navigate(only up)");
+
+
 
     refresh();
 }
@@ -127,4 +144,22 @@ void SeedManager::checkForErrors() {
 
 bool SeedManager::informationSaved() {
     return informationFlushed;
+}
+
+int SeedManager::numberDisplayingTorrents() {
+    return min(stdscr->_maxy - 4, int(session->get_torrents().size()));
+}
+
+void SeedManager::checkKeys() {
+    int key = wgetch(stdscr);
+    if (key == ERR)
+        return;
+
+    if (key == KEY_DOWN)
+        firstDisplayingTorrent = min(int(session->get_torrents().size() -
+                                numberDisplayingTorrents()), firstDisplayingTorrent + 1);
+    else if (key == KEY_UP)
+        firstDisplayingTorrent = max(0, firstDisplayingTorrent - 1);
+
+    updateInform();
 }

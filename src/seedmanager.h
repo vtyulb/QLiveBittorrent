@@ -31,6 +31,9 @@ using libtorrent::torrent_handle;
 using libtorrent::entry;
 using libtorrent::alert;
 
+using std::min;
+using std::max;
+
 class SeedManager : public QObject, public AbstractSeedingClass
 {
     Q_OBJECT
@@ -41,15 +44,18 @@ public:
 
 private:
     bool informationFlushed = false;
+    int firstDisplayingTorrent = 0;
     libtorrent::session *session;
     std::map<std::string, QString> torrentNames;
     QSet<QString> s;
 
+    int numberDisplayingTorrents();
     void addTorrent(QString);
 private slots:
     void updateInform();
     void checkForErrors();
     void findTorrents();
+    void checkKeys();
 };
 
 #endif // SEEDMANAGER_H
