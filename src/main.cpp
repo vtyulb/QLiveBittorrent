@@ -12,6 +12,8 @@
 
 namespace po=boost::program_options;
 
+AbstractSeedingClass *c;
+
 void showHelp() {
     printf("Usage: qlivebittorrent (-t string) (-d string) [-m string] [-r int]\n");
     printf("   or: qlivebittorrent [-t string] (-g | --gui) [-r | --limit-rate int]\n");
@@ -33,7 +35,11 @@ void showHelp() {
 }
 
 void sigtermListened(int sig) {
-    qApp->quit();
+    if (c->informationSaved()) {
+        qDebug() << "force quit";
+        exit(0);
+    } else
+        qApp->quit();
 }
 
 int main(int argc, char *argv[])
@@ -69,6 +75,7 @@ int main(int argc, char *argv[])
     if (vm.count("seeding-manager")) {
         QCoreApplication a(argc, argv);
         SeedManager manager(&a);
+        c = &manager;
         return a.exec();
     } else if (vm.count("gui") || (!QFile::exists(QString::fromStdString(torrent)) && !magnet)) {
         if ((vm.count("gui") == 0) && (!QFile::exists(QString::fromStdString(torrent))))
@@ -76,10 +83,12 @@ int main(int argc, char *argv[])
 
         QApplication a(argc, argv);
         MainWindow w(QString::fromStdString(torrent), QString::fromStdString(downloadPath), QString::fromStdString(mountPath), QString::fromStdString(rate), true, &a);
+        c = &w;
         return a.exec();
     } else {
         QCoreApplication a(argc, argv);
         MainWindow w(QString::fromStdString(torrent), QString::fromStdString(downloadPath), QString::fromStdString(mountPath), QString::fromStdString(rate), false, &a);
+        c = &w;
         return a.exec();
     }
 }

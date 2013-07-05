@@ -16,6 +16,7 @@
 #include <iostream>
 
 #include <constants.h>
+#include <abstractseedingclass.h>
 
 #include <libtorrent/session.hpp>
 #include <libtorrent/add_torrent_params.hpp>
@@ -30,14 +31,16 @@ using libtorrent::torrent_handle;
 using libtorrent::entry;
 using libtorrent::alert;
 
-class SeedManager : public QObject
+class SeedManager : public QObject, public AbstractSeedingClass
 {
     Q_OBJECT
 public:
     explicit SeedManager(QObject *parent = 0);
     ~SeedManager();
+    bool informationSaved();
 
 private:
+    bool informationFlushed = false;
     libtorrent::session *session;
     std::map<std::string, QString> torrentNames;
     QSet<QString> s;

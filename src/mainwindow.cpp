@@ -46,6 +46,7 @@ MainWindow::~MainWindow() {
     s.setValue("data", saveResumeData(rd));
     s.sync();
 
+    informationFlushed = true;
     qDebug() << "Sending information about (upload/download) sizes to tracker";
     delete session;
 }
@@ -217,4 +218,8 @@ void MainWindow::checkKeys() {
 bool MainWindow::midnight() {
     return (QTime::currentTime().hour() == 0) && (QTime::currentTime().minute() == 0) &&
             (QTime::currentTime().second() > 0) && (QTime::currentTime().second() < 5);
+}
+
+bool MainWindow::informationSaved() {
+    return informationFlushed;
 }

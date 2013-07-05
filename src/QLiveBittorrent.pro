@@ -19,7 +19,8 @@ SOURCES += main.cpp\
     generateimage.cpp \
     torrentdialog.cpp \
     getfolderdialog.cpp \
-    seedmanager.cpp
+    seedmanager.cpp \
+    abstractseedingclass.cpp
 
 HEADERS  += mainwindow.h \
     torrent.h \
@@ -27,7 +28,8 @@ HEADERS  += mainwindow.h \
     torrentdialog.h \
     getfolderdialog.h \
     seedmanager.h \
-    constants.h
+    constants.h \
+    abstractseedingclass.h
 
 FORMS    += \
     torrentdialog.ui

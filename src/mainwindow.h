@@ -20,6 +20,7 @@
 #include <generateimage.h>
 #include <torrentdialog.h>
 #include <constants.h>
+#include <abstractseedingclass.h>
 
 #include <iostream>
 #include <fstream>
@@ -44,20 +45,22 @@ using libtorrent::bencode;
 
 Q_DECLARE_METATYPE(libtorrent::entry)
 
-class MainWindow: public QObject
+class MainWindow: public QObject, public AbstractSeedingClass
 {
     Q_OBJECT
     
 public:
     explicit MainWindow(QString torrent, QString downloadPath, QString mountPath, QString rate, bool gui, QObject *parent = 0);
     ~MainWindow();
-    
+    bool informationSaved();
+
 private:
     libtorrent::session *session;
     QMainWindow *fake;
     QByteArray standartText;
     unsigned int standartTextLen;
     Torrent *main;
+    bool informationFlushed = false;
 
     QString resumeSavePath;
 

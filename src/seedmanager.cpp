@@ -57,6 +57,7 @@ SeedManager::~SeedManager() {
         s.sync();
     }
 
+    informationFlushed = true;
     qDebug() << "sending information about (upload/download) sizes to trackers";
     session->pause();
     delete session;
@@ -122,4 +123,8 @@ void SeedManager::checkForErrors() {
             session->remove_torrent(v[i]);
             QFile::rename(torrentNames[v[i].name()], torrentNames[v[i].name()] + ".deleted");
         }
+}
+
+bool SeedManager::informationSaved() {
+    return informationFlushed;
 }
