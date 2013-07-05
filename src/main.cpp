@@ -32,6 +32,7 @@ void showHelp() {
     printf("\t'q' - For quit\n\n");
     printf("\t'a' - For disable/enable agressive piece picking\n");
     printf("For example: qlivebittorrent -t example.torrent -d downloadsdir -m mountdir -r 200\n");
+    printf("All questions, suggestions, bugs to <vladislav.tyulbashev@yandex.ru>\n");
 
     exit(0);
 }

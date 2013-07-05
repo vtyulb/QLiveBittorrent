@@ -3,10 +3,10 @@ QLiveBittorrent
 
 
 Bittorrent client with function reading files before they would be downloaded
-Compile driver.c with string: gcc -g `pkg-config fuse --cflags --libs` driver.c -o driver
+Compile driver.c with string: gcc -g `pkg-config fuse --cflags --libs` driver.c -o qlivebittorrent-driver
 
 TODO:
-http protocol (maybe)
+http protocol (maybe); web-interface
 
 Current status of program:
 I tested it on archlinux, by downloading 1.45G file on 3Mbit channel - it works good.
@@ -14,7 +14,7 @@ If you want to test it, you should understand that my program is not a god, so p
 which you want to see can be downloaded with a big delay.
 
 Plus and Minus keys - to increase/decrease download rate limit.
-'q' - for exit
-'a' - to switch agressive/non-agressive piece picking
+'q' - for exit;
+'a' - to switch agressive/non-agressive piece picking;
 
 GPL License
