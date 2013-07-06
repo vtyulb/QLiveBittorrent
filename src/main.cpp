@@ -48,6 +48,7 @@ int main(int argc, char *argv[])
 {
     signal(SIGTERM, sigtermListened);
     signal(SIGINT, sigtermListened);
+    signal(SIGQUIT, sigtermListened);
 
     std::string torrent, bt;
     std::string downloadPath;
