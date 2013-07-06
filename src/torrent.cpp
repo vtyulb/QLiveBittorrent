@@ -16,7 +16,7 @@ Torrent::Torrent(const QString &path, const QString &mount, torrent_handle handl
     for (file_iterator i = inform.begin_files(); i != inform.end_files(); i++, cnt++)
         m["/" + QString::fromStdString(inform.files().at(i).path)] = cnt;
 
-    umountList << "-u" << "-o" << "quiet" << "hard_remove" << mount;
+    umountList << "-u" << "-o" << "hard_remove" << mount;
     umount();
     mountProcess = new QProcess;
     QObject::connect(mountProcess, SIGNAL(readyRead()), this, SLOT(needPiece()));
