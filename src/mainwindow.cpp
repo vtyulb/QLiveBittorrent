@@ -19,9 +19,12 @@ MainWindow::MainWindow(QString torrent, QString downloadPath, QString mountPath,
 
 MainWindow::~MainWindow() {
     endwin();
-    qDebug() << "saving information about torrent";
-    if ((main == NULL) || (!main->torrent->is_valid() || (main->torrent->status().progress < 0.5)))
+    if ((main == NULL) || (!main->torrent->is_valid() || (main->torrent->status().progress < 0.5))) {
+        qDebug() << "Sending information about (upload/download) sizes to tracker";
+        delete session;
         return;
+    }
+    qDebug() << "saving information about torrent";
     std::deque<alert *> trash;
     session->pop_alerts(&trash);
     main->torrent->save_resume_data(torrent_handle::save_info_dict);
@@ -145,26 +148,11 @@ void MainWindow::realAddTorrent(QString torrentFile, QString torrentPath, QStrin
 }
 
 void MainWindow::updateInform() {
-    /*std::vector<torrent_handle> v = session->get_torrents();
-
-    for (unsigned int i = 0; i < v.size(); i++) {
-        torrent_status s = v[i].status();
-        torrent_info inf = v[i].get_torrent_info();
-        std::vector<partial_piece_info> tmp;
-        v[i].get_download_queue(tmp);
-        std::vector<libtorrent::partial_piece_info> inform;
-        v[i].get_download_queue(inform);
-        if (inform.size())
-            for (unsigned int i = 0; i < inform.size(); i++)
-                qDebug() << inform[i].piece_index << inform[i].piece_state;
-    }*/
-
-
     erase();
     libtorrent::torrent_status status = main->torrent->status();
     libtorrent::torrent_info info = main->torrent->get_torrent_info();
     printw("%s", standartText.constData());
-    printw("%d of %d peers connected; %d of %d MB downloaded; progress - %d\%; d - %dKB/s; u - %dKB/s\n",
+    printw("%d of %d peers connected; %d of %d MB downloaded; progress - %d\% d - %dKB/s; u - %dKB/s\n",
            status.num_connections, status.list_seeds + status.list_peers, int((info.total_size() / 1000000) * status.progress),
            info.total_size() / 1000000, int(status.progress * 100), status.download_rate / 1000, status.upload_rate / 1000);
 
