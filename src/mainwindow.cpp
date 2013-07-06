@@ -195,8 +195,6 @@ void MainWindow::checkKeys() {
         session->set_download_rate_limit(session->download_rate_limit() + 10000);
     else if (key == '-')
         session->set_download_rate_limit(session->download_rate_limit() - 10000);
-    else if (key == 'q')
-        qApp->quit();
     else if (key == 'a')
         main->invertAgressive();
 
