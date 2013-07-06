@@ -27,8 +27,8 @@ void showHelp() {
     printf("\t-s --seeding-manager     - to start seed-manager instead of client\n");
     printf("\t-h --help                - to view this help\n\n");
     printf("In interactive mode there are several available keys:\n");
-    printf("\t'+' - For increasing download rate limit(+10KB)\n");
-    printf("\t'-' - For decreasing download rate limit(-10KB)\n");
+    printf("\t'+' - For increasing rate limit(+10KB)\n");
+    printf("\t'-' - For decreasing rate limit(-10KB)\n");
     printf("\t'a' - For disable/enable agressive piece picking\n\n");
     printf("For example: qlivebittorrent -t example.torrent -d downloadsdir -m mountdir -r 200\n");
     printf("All questions, suggestions, bugs to <vladislav.tyulbashev@yandex.ru>\n");
