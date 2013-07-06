@@ -153,7 +153,7 @@ void MainWindow::updateInform() {
     libtorrent::torrent_status status = main->torrent->status();
     libtorrent::torrent_info info = main->torrent->get_torrent_info();
     printw("%s", standartText.constData());
-    printw("%d of %d peers connected; %d of %d MB downloaded;\nprogress - %d\% %d - %dKB/s; u - %dKB/s\n",
+    printw("%d of %d peers connected; %d of %d MB downloaded;\nprogress - %d%% d - %dKB/s; u - %dKB/s\n",
            status.num_connections, status.list_seeds + status.list_peers, int((info.total_size() / 1000000) * status.progress),
            info.total_size() / 1000000, int(status.progress * 100), status.download_rate / 1000, status.upload_rate / 1000);
 
