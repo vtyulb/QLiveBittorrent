@@ -32,6 +32,7 @@ SeedManager::SeedManager(QString rate, QObject *parent) :
     initscr();
     nodelay(stdscr, true);
     keypad(stdscr, true);
+    noecho()
 }
 
 SeedManager::~SeedManager() {
@@ -91,6 +92,7 @@ void SeedManager::addTorrent(QString torrent) {
             session->add_torrent(inf, (s.value("path").toString() + QString::fromStdString(inf->name()) + "/").toStdString(), e);
 
     h.set_upload_mode(true);
+    h.auto_managed(false);
     if (h.is_paused())
         h.resume();
 
