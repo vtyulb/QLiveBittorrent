@@ -32,6 +32,7 @@ SeedManager::SeedManager(QString rate, QObject *parent) :
     initscr();
     nodelay(stdscr, true);
     keypad(stdscr, true);
+    noecho();
 }
 
 SeedManager::~SeedManager() {
