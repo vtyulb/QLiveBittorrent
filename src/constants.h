@@ -13,7 +13,7 @@
 using libtorrent::torrent_status;
 
 #ifdef PORTABLE
-    const QString settingsPath = "./";
+    const QString settingsPath = "/.qlivebittorrent/";
     const QString driver="./qlivebittorrent-driver";
 #else
     const QString settingsPath = QDir::homePath() + "/.qlivebittorrent/";
