@@ -132,8 +132,11 @@ void MainWindow::realAddTorrent(QString torrentFile, QString torrentPath, QStrin
         for (i = i + 1; torrentFile[i] != '&'; i++)
             url += torrentFile[i];
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+        QString name = QUrl(url).toString().replace("+", " ");
+#else
         QString name = QUrl(url).toString(QUrl::PreferLocalFile).replace("+", " ");
-
+#endif
         p.save_path = (torrentPath + name + "/").toStdString();
 
         const torrent_handle h = libtorrent::add_magnet_uri(*session, torrentFile.toStdString(), p);
