@@ -3,6 +3,7 @@
 #include <fuse.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <sys/stat.h>
@@ -13,7 +14,7 @@ static char *mountPoint;
 static int mountLen;
 static char *buffer;
 
-void recreateBuf(char *path) {
+void recreateBuf(const char *path) {
     int i;
     for (i = mountLen; path[i - mountLen] != 0; i++)
         buffer[i] = path[i - mountLen];
@@ -64,7 +65,7 @@ static int qlive_read(const char *path, char *buf, size_t size, off_t offset,
               struct fuse_file_info *fi)
 {
     (void) fi;
-    printf("%s\n%lld\n%lld\n", path, offset, size);
+    printf("%s\n%lld\n%lld\n", path, offset, (long long int)size);
     fflush(stdout);
     int success;
     scanf("%d", &success);
