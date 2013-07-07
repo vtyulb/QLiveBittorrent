@@ -117,11 +117,11 @@ void SeedManager::updateInform() {
 
     if ((firstDisplayingTorrent + numberDisplayingTorrents() < v.size()))
         if (firstDisplayingTorrent)
-            printw("Arrows to navigate(up and down)\n");
+            printw("Arrows to navigate (up and down)\n");
         else
             printw("Arrows to navigate (only down)\n");
     else if (firstDisplayingTorrent)
-        printw("Arrow to navigate(only up)\n");
+        printw("Arrow to navigate (only up)\n");
 
     if (session->upload_rate_limit() != 0)
         printw("Upload rate limit: %d(KB/s)", session->upload_rate_limit() / 1000);

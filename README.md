@@ -3,7 +3,7 @@ QLiveBittorrent
 
 
 Bittorrent client with function reading files before they would be downloaded
-Compile driver.c with string: gcc -g `pkg-config fuse --cflags --libs` driver.c -o qlivebittorrent-driver
+Compile driver.c with string: gcc -g driver.c `pkg-config fuse --cflags --libs` -o qlivebittorrent-driver
 
 qlivebittorrent try to find qlivebittorrent-driver in the working directory.
 In non-Portable version (define PORTABLE in qlivebittorrent.pro) it would try
