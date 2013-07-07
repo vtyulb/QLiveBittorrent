@@ -93,9 +93,11 @@ int main(int argc, char *argv[])
             printf("You must specify a valid torrent file (or --gui)\n");
 
         QApplication a(argc, argv);
-        MainWindow w(QString::fromStdString(torrent), QString::fromStdString(downloadPath), QString::fromStdString(mountPath), QString::fromStdString(rate), true, &a);
+        MainWindow w(QString::fromStdString(torrent), QString::fromStdString(downloadPath), QString::fromStdString(mountPath), QString::fromStdString(rate), true);
         c = &w;
-        return a.exec();
+        a.exec();
+        QCoreApplication b(argc, argv);
+        return b.exec();
     } else {
         QCoreApplication a(argc, argv);
         MainWindow w(QString::fromStdString(torrent), QString::fromStdString(downloadPath), QString::fromStdString(mountPath), QString::fromStdString(rate), false, &a);
