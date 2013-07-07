@@ -81,7 +81,6 @@ void MainWindow::findPaths(QString torrent) {
     TorrentDialog *dialog = new TorrentDialog(torrent, fake);
     dialog->show();
     QObject::connect(dialog, SIGNAL(success(QString,QString,QString)), this, SLOT(realAddTorrent(QString, QString, QString)));
-    QObject::connect(dialog, SIGNAL(success(QString,QString,QString)), dialog, SLOT(deleteLater()));
     QObject::connect(dialog, SIGNAL(rejected()), qApp, SLOT(quit()));
 }
 

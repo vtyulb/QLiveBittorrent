@@ -11,7 +11,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = QLiveBittorrent
 TEMPLATE = app
 
-LIBS += -lboost_system -ltorrent-rasterbar -lboost_program_options -lcurses
+LIBS += -lboost_system -ltorrent-rasterbar -lboost_program_options -lncurses
 
 SOURCES += main.cpp\
         mainwindow.cpp \
