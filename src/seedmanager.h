@@ -44,7 +44,7 @@ public:
 
 private:
     bool informationFlushed;
-    int firstDisplayingTorrent = 0;
+    int firstDisplayingTorrent;
     libtorrent::session *session;
     std::map<std::string, QString> torrentNames;
     QSet<QString> s;
