@@ -60,7 +60,7 @@ private:
     QByteArray standartText;
     unsigned int standartTextLen;
     Torrent *main;
-    bool informationFlushed = false;
+    bool informationFlushed;
 
     QString resumeSavePath;
 

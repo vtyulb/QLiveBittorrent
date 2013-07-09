@@ -3,6 +3,7 @@
 SeedManager::SeedManager(QString rate, QObject *parent) :
     QObject(parent)
 {
+    informationFlushed = false;
     session = new libtorrent::session;
     session->listen_on(std::make_pair(6881, 6889));
     session->set_alert_mask(0);

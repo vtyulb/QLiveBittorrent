@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 
 MainWindow::MainWindow(QString torrent, QString downloadPath, QString mountPath, QString rate, bool gui, QObject *parent): QObject(parent) {
+    informationFlushed = false;
     initSession(rate);
     initscr();
     nodelay(stdscr, true);

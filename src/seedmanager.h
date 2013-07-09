@@ -43,7 +43,7 @@ public:
     bool informationSaved();
 
 private:
-    bool informationFlushed = false;
+    bool informationFlushed;
     int firstDisplayingTorrent = 0;
     libtorrent::session *session;
     std::map<std::string, QString> torrentNames;
