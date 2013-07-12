@@ -37,7 +37,11 @@ public:
     int lastAsk;
     bool agressive;
     void invertAgressive();
+    void setMountPath(QString);
+    bool mountStatus();
     QTime *lastAskTime;
+    QString mountPath;
+    QString downloadPath;
 
 private:
     QProcess *mountProcess;
@@ -57,6 +61,8 @@ private slots:
     void needPiece();
     void staticRecall();
     void lesserPeers();
+public slots:
+    void remount();
 };
 
 #endif // TORRENT_H

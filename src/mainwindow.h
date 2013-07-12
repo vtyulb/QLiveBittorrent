@@ -15,12 +15,15 @@
 #include <QTime>
 #include <QFileInfo>
 #include <QUrl>
+#include <QMap>
+#include <QFont>
 
 #include <torrent.h>
 #include <generateimage.h>
 #include <torrentdialog.h>
 #include <constants.h>
 #include <abstractseedingclass.h>
+#include <ui_mainwindow.h>
 
 #include <iostream>
 #include <fstream>
@@ -57,6 +60,9 @@ public:
 private:
     libtorrent::session *session;
     QMainWindow *fake;
+    QMap<std::string, Torrent *> mapTorrent;
+    QSet<QString> s;
+    Ui_MainWindow *ui;
     QByteArray standartText;
     unsigned int standartTextLen;
     Torrent *main;
@@ -68,14 +74,19 @@ private:
     void findPaths(QString torrent);
     void die(QString error);
     void setupTimers();
+    void findTorrents();
+    void addTorrentByName(QString torrent);
 
     bool midnight();
+    bool hasGUI();
 private slots:
     void addTorrent();
     void realAddTorrent(QString torrentFile, QString torrentPath, QString mountPath);
     void updateInform();
     void checkKeys();
     void updateStandartText();
+    void updateTable();
+    void remountRequest();
 };
 
 #endif // MAINWINDOW_H

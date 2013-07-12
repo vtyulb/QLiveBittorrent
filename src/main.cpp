@@ -95,9 +95,7 @@ int main(int argc, char *argv[])
         QApplication a(argc, argv);
         MainWindow w(QString::fromStdString(torrent), QString::fromStdString(downloadPath), QString::fromStdString(mountPath), QString::fromStdString(rate), true);
         c = &w;
-        a.exec();
-        QCoreApplication b(argc, argv);
-        return b.exec();
+        return a.exec();
     } else {
         QCoreApplication a(argc, argv);
         MainWindow w(QString::fromStdString(torrent), QString::fromStdString(downloadPath), QString::fromStdString(mountPath), QString::fromStdString(rate), false, &a);

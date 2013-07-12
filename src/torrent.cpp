@@ -3,6 +3,8 @@
 Torrent::Torrent(const QString &path, const QString &mount, torrent_handle handle, QObject *parent) :
     QObject(parent)
 {
+    mountProcess = new QProcess;
+    downloadPath = path;
     lastAskTime = NULL;
     QDir tmp;
     tmp.mkdir(mount);
@@ -16,16 +18,10 @@ Torrent::Torrent(const QString &path, const QString &mount, torrent_handle handl
     for (file_iterator i = inform.begin_files(); i != inform.end_files(); i++, cnt++)
         m["/" + QString::fromStdString(inform.files().at(i).path)] = cnt;
 
-    umountList << "-u" << "-o" << "hard_remove" << mount;
-    umount();
-    mountProcess = new QProcess;
+    umountList << "-u" << "-q" << "-o" << "hard_remove" << mount;
     QObject::connect(mountProcess, SIGNAL(readyRead()), this, SLOT(needPiece()));
-    QStringList params;
-    params << "-s"; //single-threaded
-    params << "-f"; //force don't know what
-    params << mount;
-    params << path;
-    mountProcess->start(driver, params);
+    mountPath = mount;
+    remount();
     lastAsk = 0;
     priorities = new bool[torrent->get_torrent_info().num_pieces()];
     for (int i = 0; i < torrent->get_torrent_info().num_pieces(); i++)
@@ -158,4 +154,26 @@ void Torrent::waitForMetadata(const torrent_handle *handle) {
     qDebug() << "Waiting for metadata";
     while (!handle->has_metadata())
         sleep(100);
+}
+
+void Torrent::remount() {
+    mountProcess->close();
+    umount();
+    QStringList params;
+    params << "-s"; //single-threaded
+    params << "-f"; //force don't know what
+    params << mountPath;
+    params << downloadPath;
+    mountProcess->start(driver, params);
+}
+
+void Torrent::setMountPath(QString mount) {
+    mountPath = mount;
+}
+
+bool Torrent::mountStatus() {
+    if (this == NULL)
+        return false;
+    else
+        return mountProcess->state() == QProcess::Running;
 }

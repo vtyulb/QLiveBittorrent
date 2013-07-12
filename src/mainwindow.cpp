@@ -3,22 +3,40 @@
 MainWindow::MainWindow(QString torrent, QString downloadPath, QString mountPath, QString rate, bool gui, QObject *parent): QObject(parent) {
     informationFlushed = false;
     initSession(rate);
-    initscr();
-    nodelay(stdscr, true);
-    noecho();
+    if (!gui) {
+        initscr();
+        nodelay(stdscr, true);
+        noecho();
+    }
+
     main = NULL;
-    if (!gui)
+    fake = NULL;
+    if (!gui) {
         realAddTorrent(torrent, downloadPath, mountPath);
-    else {
+        setupTimers();
+    } else {
         fake = new QMainWindow;
-        if (QFile(torrent).exists() || isMagnet(torrent))
-            findPaths(torrent);
-        else
-            addTorrent();
+        ui = new Ui_MainWindow;
+        ui->setupUi(fake);
+        QObject::connect(ui->actionAdd_torrent, SIGNAL(triggered()), this, SLOT(addTorrent()));
+        QObject::connect(ui->actionExit, SIGNAL(triggered()), qApp, SLOT(quit()));
+        QStringList labels;
+        labels << "name" << "status" << "progress" << "seeds" << "connected" << "dspeed (KB/s)" << "uspeed (KB/s)" << "size (MB)";
+        ui->tableWidget->setColumnCount(8);
+        ui->tableWidget->setHorizontalHeaderLabels(labels);
+        ui->frame->hide();
+        QTimer *timer = new QTimer;
+        QObject::connect(timer, SIGNAL(timeout()), this, SLOT(updateTable()));
+        QObject::connect(ui->remountButton, SIGNAL(clicked()), this, SLOT(remountRequest()));
+        timer->setInterval(1000);
+        timer->start();
+        findTorrents();
+        fake->show();
     }
 }
 
 MainWindow::~MainWindow() {
+    fake->hide();
     endwin();
     if ((main == NULL) || (!main->torrent->is_valid() || (main->torrent->status().progress < 0.5))) {
         informationFlushed = true;
@@ -26,35 +44,38 @@ MainWindow::~MainWindow() {
         delete session;
         return;
     }
-    qDebug() << "saving information about torrent";
-    std::deque<alert *> trash;
-    session->pop_alerts(&trash);
-    main->torrent->save_resume_data(torrent_handle::save_info_dict);
-    const alert *a = session->wait_for_alert(libtorrent::seconds(3));
-    if (a == NULL) {
-        qDebug() << "Can not save resume data";
-        exit(1);
-    }
+    qDebug() << "saving information about torrents";
+    std::vector<torrent_handle> v = session->get_torrents();
+    for (int i = 0; i < v.size(); i++) {
+        std::deque<alert *> trash;
+        session->pop_alerts(&trash);
+        v[i].save_resume_data(torrent_handle::save_info_dict);
+        const alert *a = session->wait_for_alert(libtorrent::seconds(3));
+        if (a == NULL) {
+            qDebug() << "Can not save resume data";
+            break;
+        }
 
-    std::auto_ptr<alert> holder = session->pop_alert();
-    if (libtorrent::alert_cast<libtorrent::save_resume_data_failed_alert>(a)) {
-        qDebug() << "Failed alert";
-        exit(1);
-    }
+        std::auto_ptr<alert> holder = session->pop_alert();
+        if (libtorrent::alert_cast<libtorrent::save_resume_data_failed_alert>(a)) {
+            qDebug() << "Failed alert";
+            break;
+        }
 
-    const libtorrent::save_resume_data_alert *rd = libtorrent::alert_cast<libtorrent::save_resume_data_alert>(a);
-    if (rd == 0) {
-        qDebug() << "Very big fail";
-        exit(1);
-    }
+        const libtorrent::save_resume_data_alert *rd = libtorrent::alert_cast<libtorrent::save_resume_data_alert>(a);
+        if (rd == 0) {
+            qDebug() << "Very big fail";
+            break;
+        }
 
-    QSettings s(settingsPath + QString::fromStdString(main->torrent->name()) + ".qlivebittorrent", QSettings::IniFormat);
-    s.setValue("path", QVariant(resumeSavePath));
-    s.setValue("data", saveResumeData(rd));
-    s.sync();
+        QSettings s(settingsPath + QString::fromStdString(v[i].name()) + ".qlivebittorrent", QSettings::IniFormat);
+        s.setValue("data", QVariant(saveResumeData(rd)));
+        s.setValue("path", QVariant(mapTorrent[v[i].name()]->downloadPath));
+        s.sync();
+    }
 
     informationFlushed = true;
-    qDebug() << "Sending information about (upload/download) sizes to tracker";
+    qDebug() << "Sending information about (upload/download) sizes to trackers";
     delete session;
 }
 
@@ -74,7 +95,7 @@ void MainWindow::addTorrent() {
                                                    QString("*.torrent"));
     if (QFile(torrent).exists() || isMagnet(torrent))
         findPaths(torrent);
-    else
+    else if (!hasGUI())
         die("User don't choose torrent file");
 }
 
@@ -86,7 +107,16 @@ void MainWindow::findPaths(QString torrent) {
 }
 
 void MainWindow::updateStandartText() {
+    if (hasGUI())
+        return;
+
     QString text;
+    text += QString("Mount status: ");
+    if (main->mountStatus())
+        text += "mounted\n";
+    else
+        text += "error ('r' to remount)\n";
+
     if (session->download_rate_limit() != 0)
         text += QString("Download rate limit: %1KB/s\n").arg(session->download_rate_limit() / 1000);
 
@@ -106,8 +136,12 @@ void MainWindow::updateStandartText() {
 }
 
 void MainWindow::realAddTorrent(QString torrentFile, QString torrentPath, QString mountPath) {
-    if (!QFile::exists(torrentFile) && !isMagnet(torrentFile))
-        die("torrent file not found");
+    if (!QFile::exists(torrentFile) && !isMagnet(torrentFile)) {
+        if (!hasGUI())
+            die("torrent file not found");\
+        else
+            return;
+    }
 
     standartText = ("Torrent file: " + torrentFile + "\nDownload path: " + torrentPath + "\nMount path: " + mountPath + "\n").toLocal8Bit();
     standartTextLen = standartText.size();
@@ -132,26 +166,26 @@ void MainWindow::realAddTorrent(QString torrentFile, QString torrentPath, QStrin
         for (i = i + 1; torrentFile[i] != '&'; i++)
             url += torrentFile[i];
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-        QString name = QUrl(url).toString().replace("+", " ");
-#else
-        QString name = QUrl(url).toString(QUrl::PreferLocalFile).replace("+", " ");
-#endif
-        p.save_path = (torrentPath + name + "/").toStdString();
+        url = url.replace("+", " ");
+
+        p.save_path = (torrentPath + url + "/").toStdString();
 
         const torrent_handle h = libtorrent::add_magnet_uri(*session, torrentFile.toStdString(), p);
         main = new Torrent(torrentPath + QString::fromStdString(h.name()), mountPath + QString::fromStdString(h.name()), h, this);
+        mapTorrent[main->torrent->name()] = main;
     } else {
         torrent_info *inf = new libtorrent::torrent_info(torrentFile.toStdString());
         p.ti = inf;
         p.save_path = (torrentPath + QString::fromStdString(inf->name()) + "/").toStdString();
         main = new Torrent(torrentPath + QString::fromStdString(inf->name()), mountPath + QString::fromStdString(inf->name()), session->add_torrent(p), this);
+        mapTorrent[main->torrent->name()] = main;
     }
-
-    setupTimers();
 }
 
 void MainWindow::updateInform() {
+    if (hasGUI())
+        return;
+
     erase();
     libtorrent::torrent_status status = main->torrent->status();
     libtorrent::torrent_info info = main->torrent->get_torrent_info();
@@ -201,6 +235,8 @@ void MainWindow::checkKeys() {
         session->set_download_rate_limit(session->download_rate_limit() - 10000);
     else if (key == 'a')
         main->invertAgressive();
+    else if (key == 'r')
+        main->remount();
 
     updateStandartText();
     updateInform();
@@ -214,3 +250,74 @@ bool MainWindow::midnight() {
 bool MainWindow::informationSaved() {
     return informationFlushed;
 }
+
+void MainWindow::updateTable() {
+    std::vector<torrent_handle> torrents = session->get_torrents();
+    ui->tableWidget->setRowCount(torrents.size());
+    for (int i = 0; i < torrents.size(); i++) {
+        ui->tableWidget->setItem(i, 0, new QTableWidgetItem(QString::fromStdString(torrents[i].name())));
+        ui->tableWidget->setItem(i, 1, new QTableWidgetItem(getNormalStatus(torrents[i].status().state)));
+        ui->tableWidget->setItem(i, 2, new QTableWidgetItem(QString::number(torrents[i].status().progress )));
+        ui->tableWidget->setItem(i, 3, new QTableWidgetItem(QString::number(torrents[i].status().list_seeds)));
+        ui->tableWidget->setItem(i, 4, new QTableWidgetItem(QString::number(torrents[i].status().num_connections)));
+        ui->tableWidget->setItem(i, 5, new QTableWidgetItem(QString::number(torrents[i].status().download_rate / 1000)));
+        ui->tableWidget->setItem(i, 6, new QTableWidgetItem(QString::number(torrents[i].status().upload_rate / 1000)));
+        ui->tableWidget->setItem(i, 7, new QTableWidgetItem(QString::number(torrents[i].get_torrent_info().total_size() / 1000000)));
+    }
+
+    if (torrents.size()) {
+//        ui->widget = new GenerateImage(torrents[ui->tableWidget->currentRow()]);
+//        ui->widget->repaint();
+        torrent_handle *active = &torrents[ui->tableWidget->currentRow()];
+        if ((ui->tableWidget->currentRow() < 0) || (ui->tableWidget->currentRow() >= torrents.size())) {
+            ui->frame->hide();
+            return;
+        }
+        ui->frame->show();
+
+        ui->downloadPathLabel->setText("Download path: " + mapTorrent[active->name()]->downloadPath);
+        ui->mountLabel->setText("Mounted to: " + mapTorrent[active->name()]->mountPath);
+        if (mapTorrent[active->name()]->mountStatus())
+            ui->mountLabel->setText(ui->mountLabel->text() + "(OK)");
+        else
+            ui->mountLabel->setText(ui->mountLabel->text() + "(ERROR)");
+    } else
+        ui->frame->hide();
+}
+
+bool MainWindow::hasGUI() {
+    return fake != NULL;
+}
+
+void MainWindow::remountRequest() {
+    if (ui->tableWidget->rowCount())
+        mapTorrent[session->get_torrents()[ui->tableWidget->currentRow()].name()]->remount();
+}
+
+void MainWindow::findTorrents() {
+    QDir dir(settingsPath);
+    QFileInfoList list = dir.entryInfoList();
+    for (int i = 0; i < list.size(); i++)
+        if (!s.contains(list[i].fileName()))
+            if (list[i].fileName().right(16) == QString(".qlivebittorrent")) {
+                addTorrentByName(list[i].fileName());
+                s.insert(list[i].fileName());
+            }
+}
+
+void MainWindow::addTorrentByName(QString torrent) {
+    QSettings s(settingsPath + torrent, QSettings::IniFormat);
+    QByteArray data = s.value("data").toByteArray();
+    libtorrent::entry e = libtorrent::bdecode(data.begin(), data.end());
+    libtorrent::torrent_info *inf = new libtorrent::torrent_info(e);
+    const libtorrent::torrent_handle h =
+            session->add_torrent(inf, (s.value("path").toString() + QString::fromStdString(inf->name()) + "/").toStdString(), e);
+
+    h.set_upload_mode(true);
+    h.auto_managed(false);
+    if (h.is_paused())
+        h.resume();
+
+    mapTorrent[h.name()] = new Torrent(s.value("path").toString(), "Not mount", h, this);
+}
+

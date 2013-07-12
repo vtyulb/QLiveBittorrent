@@ -1,7 +1,7 @@
 #include "generateimage.h"
 
-GenerateImage::GenerateImage()
-{
+GenerateImage::GenerateImage(const torrent_handle &h) {
+    torrent = h;
 }
 
 QImage GenerateImage::generate(const bitfield &b, const vector<partial_piece_info> &p) {
@@ -27,4 +27,13 @@ QImage GenerateImage::generate(const bitfield &b, const vector<partial_piece_inf
     }
 
     return image;
+}
+
+void GenerateImage::paintEvent(QPaintEvent *event) {
+    QPainter p(this);
+    std::vector<partial_piece_info> inf;
+    torrent.get_download_queue(inf);
+    p.drawImage(0, 0, generate(torrent.status().pieces, inf), this->width(), this->height());
+    p.end();
+    event->accept();
 }
