@@ -77,7 +77,6 @@ private:
     void setupTimers();
     void findTorrents();
     void addTorrentByName(QString torrent);
-
     bool midnight();
     bool hasGUI();
 private slots:
@@ -89,6 +88,9 @@ private slots:
     void updateTable();
     void remountRequest();
     void realRemount(QString);
+    void reCell();
+    void showAbout();
+    void showAboutQt();
 };
 
 #endif // MAINWINDOW_H

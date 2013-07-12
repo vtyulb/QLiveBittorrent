@@ -31,6 +31,10 @@ MainWindow::MainWindow(QString torrent, QString downloadPath, QString mountPath,
         timer->setInterval(1000);
         timer->start();
         findTorrents();
+        QObject::connect(ui->tableWidget, SIGNAL(cellClicked(int,int)), this, SLOT(updateTable()));
+        QObject::connect(ui->tableWidget, SIGNAL(cellClicked(int,int)), this, SLOT(reCell()));
+        QObject::connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(showAbout()));
+        QObject::connect(ui->actionAbout_Qt, SIGNAL(triggered()), this, SLOT(showAboutQt()));
         fake->show();
     }
 }
@@ -203,7 +207,7 @@ void MainWindow::updateInform() {
     if (inf.size() > 0)
         for (unsigned int i = 0; i < inf.size(); i++)
             printw("(%d, speed-%d) ", inf[i].piece_index, inf[i].piece_state);
-    refresh();\
+    refresh();
 }
 
 void MainWindow::die(QString error) {
@@ -283,6 +287,8 @@ void MainWindow::updateTable() {
             ui->mountLabel->setText(ui->mountLabel->text() + "(ERROR)");
     } else
         ui->frame->hide();
+
+    fake->update();
 }
 
 bool MainWindow::hasGUI() {
@@ -326,6 +332,18 @@ void MainWindow::addTorrentByName(QString torrent) {
     if (h.is_paused())
         h.resume();
 
-    mapTorrent[h.name()] = new Torrent(s.value("path").toString() + QString::fromStdString(h.name()), "Not mount", h, this);
+    mapTorrent[h.name()] = new Torrent(s.value("path").toString() + QString::fromStdString(h.name()), "/", h, this);
 }
 
+void MainWindow::reCell() {
+    ui->tableWidget->setRangeSelected(QTableWidgetSelectionRange(ui->tableWidget->currentRow(), 0, ui->tableWidget->currentRow(), 7), true);
+    fake->repaint();
+}
+
+void MainWindow::showAbout() {
+    QMessageBox::about(fake, "About QLiveBittorrent", "QLiveBittorrent - opensource program, which use Qt and libtorrent-rasterbar.\nWritten by V.S.Tyulbashev.\n<vladislav.tyulbashev@yandex.ru>");
+}
+
+void MainWindow::showAboutQt() {
+    QMessageBox::aboutQt(fake);
+}
