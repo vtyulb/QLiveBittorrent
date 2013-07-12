@@ -289,9 +289,17 @@ bool MainWindow::hasGUI() {
     return fake != NULL;
 }
 
+void MainWindow::realRemount(QString mount) {
+    mapTorrent[session->get_torrents()[ui->tableWidget->currentRow()].name()]->setMountPath(mount);
+    mapTorrent[session->get_torrents()[ui->tableWidget->currentRow()].name()]->remount();
+}
+
 void MainWindow::remountRequest() {
-    if (ui->tableWidget->rowCount())
-        mapTorrent[session->get_torrents()[ui->tableWidget->currentRow()].name()]->remount();
+    if (ui->tableWidget->rowCount()) {
+        SetMountPathDialog *dialog = new SetMountPathDialog(mapTorrent[session->get_torrents()[ui->tableWidget->currentRow()].name()]->mountPath);
+        dialog->show();
+        QObject::connect(dialog, SIGNAL(accepted(QString)), this, SLOT(realRemount(QString)));
+    }
 }
 
 void MainWindow::findTorrents() {
@@ -318,6 +326,6 @@ void MainWindow::addTorrentByName(QString torrent) {
     if (h.is_paused())
         h.resume();
 
-    mapTorrent[h.name()] = new Torrent(s.value("path").toString(), "Not mount", h, this);
+    mapTorrent[h.name()] = new Torrent(s.value("path").toString() + QString::fromStdString(h.name()), "Not mount", h, this);
 }
 

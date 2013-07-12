@@ -20,7 +20,8 @@ SOURCES += main.cpp\
     torrentdialog.cpp \
     getfolderdialog.cpp \
     seedmanager.cpp \
-    abstractseedingclass.cpp
+    abstractseedingclass.cpp \
+    setmountpathdialog.cpp
 
 HEADERS  += mainwindow.h \
     torrent.h \
@@ -29,11 +30,13 @@ HEADERS  += mainwindow.h \
     getfolderdialog.h \
     seedmanager.h \
     constants.h \
-    abstractseedingclass.h
+    abstractseedingclass.h \
+    setmountpathdialog.h
 
 FORMS    += \
     torrentdialog.ui \
-    mainwindow.ui
+    mainwindow.ui \
+    setmountpathdialog.ui
 
 PKGCONFIG += libtorrent-rasterbar
 

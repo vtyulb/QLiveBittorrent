@@ -24,6 +24,7 @@
 #include <constants.h>
 #include <abstractseedingclass.h>
 #include <ui_mainwindow.h>
+#include <setmountpathdialog.h>
 
 #include <iostream>
 #include <fstream>
@@ -87,6 +88,7 @@ private slots:
     void updateStandartText();
     void updateTable();
     void remountRequest();
+    void realRemount(QString);
 };
 
 #endif // MAINWINDOW_H
