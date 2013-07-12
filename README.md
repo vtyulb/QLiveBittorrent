@@ -20,7 +20,6 @@ which you want to see can be downloaded with a big delay.
 http://habrahabr.ru/post/185770/
 
 Plus and Minus keys - to increase/decrease download rate limit.
-'q' - for exit;
 'a' - to switch agressive/non-agressive piece picking;
 
 GPL License
