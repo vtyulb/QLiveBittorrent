@@ -40,8 +40,11 @@ MainWindow::MainWindow(QString torrent, QString downloadPath, QString mountPath,
 }
 
 MainWindow::~MainWindow() {
-    fake->hide();
-    endwin();
+    if (hasGUI())
+        fake->hide();
+    else
+        endwin();
+
     if ((main == NULL) || (!main->torrent->is_valid() || (main->torrent->status().progress < 0.5))) {
         informationFlushed = true;
         qDebug() << "Sending information about (upload/download) sizes to tracker";
