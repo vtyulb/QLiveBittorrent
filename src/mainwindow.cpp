@@ -328,14 +328,14 @@ void MainWindow::addTorrentByName(QString torrent) {
     libtorrent::entry e = libtorrent::bdecode(data.begin(), data.end());
     libtorrent::torrent_info *inf = new libtorrent::torrent_info(e);
     const libtorrent::torrent_handle h =
-            session->add_torrent(inf, (s.value("path").toString() + QString::fromStdString(inf->name()) + "/").toStdString(), e);
+            session->add_torrent(inf, (s.value("path").toString()).toStdString(), e);
 
     h.set_upload_mode(true);
     h.auto_managed(false);
     if (h.is_paused())
         h.resume();
 
-    mapTorrent[h.name()] = new Torrent(s.value("path").toString() + QString::fromStdString(h.name()), "/", h, this);
+    mapTorrent[h.name()] = new Torrent(s.value("path").toString(), "/", h, this);
 }
 
 void MainWindow::reCell() {
