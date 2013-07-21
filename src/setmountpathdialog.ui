@@ -29,7 +29,7 @@
    <item>
     <widget class="GetFolderDialog" name="groupBox">
      <property name="title">
-      <string>Please choose mount path (clear folder required)</string>
+      <string>Please choose mount path (clean folder required)</string>
      </property>
     </widget>
    </item>
