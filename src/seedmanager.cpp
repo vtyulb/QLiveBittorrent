@@ -80,6 +80,7 @@ void SeedManager::findTorrents() {
     for (int i = 0; i < list.size(); i++)
         if (!s.contains(list[i].fileName()))
             if (list[i].fileName().right(16) == QString(".qlivebittorrent")) {
+                qDebug() << "loading" << list[i].fileName();
                 addTorrent(list[i].fileName());
                 s.insert(list[i].fileName());
             }
