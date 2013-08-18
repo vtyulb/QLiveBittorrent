@@ -155,7 +155,7 @@ bool SeedManager::informationSaved() {
 }
 
 int SeedManager::numberDisplayingTorrents() {
-    return min(stdscr->_maxy - 4, int(session->get_torrents().size()));
+    return min(stdscr->_maxy - 2, int(session->get_torrents().size()));
 }
 
 void SeedManager::checkKeys() {
