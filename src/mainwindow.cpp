@@ -173,7 +173,7 @@ void MainWindow::realAddTorrent(QString torrentFile, QString torrentPath, QStrin
         for (i = i + 1; torrentFile[i] != '&'; i++)
             url += torrentFile[i];
 
-        url = url.replace("+", " ");
+        url = QUrl::fromEncoded(url.toLocal8Bit()).toString();
 
         p.save_path = (torrentPath + url + "/").toStdString();
 

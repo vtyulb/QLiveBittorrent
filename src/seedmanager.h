@@ -22,7 +22,6 @@
 #include <libtorrent/add_torrent_params.hpp>
 #include <libtorrent/entry.hpp>
 #include <libtorrent/alert_types.hpp>
-#include <libtorrent/bencode.hpp>
 
 using libtorrent::add_torrent_params;
 using libtorrent::torrent_info;

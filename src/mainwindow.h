@@ -31,7 +31,6 @@
 #include <iterator>
 #include <iomanip>
 #include "libtorrent/entry.hpp"
-#include "libtorrent/bencode.hpp"
 #include "libtorrent/torrent_info.hpp"
 #include "libtorrent/lazy_entry.hpp"
 #include "libtorrent/session.hpp"
