@@ -178,7 +178,7 @@ void MainWindow::realAddTorrent(QString torrentFile, QString torrentPath, QStrin
         p.save_path = (torrentPath + url + "/").toStdString();
 
         const torrent_handle h = libtorrent::add_magnet_uri(*session, torrentFile.toStdString(), p);
-        main = new Torrent(torrentPath + QString::fromStdString(h.name()), mountPath + QString::fromStdString(h.name()), h, this);
+        main = new Torrent(torrentPath + url, mountPath + url, h, this);
         mapTorrent[main->torrent->name()] = main;
     } else {
         torrent_info *inf = new libtorrent::torrent_info(torrentFile.toStdString());
