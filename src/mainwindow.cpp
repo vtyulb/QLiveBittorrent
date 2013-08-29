@@ -173,7 +173,12 @@ void MainWindow::realAddTorrent(QString torrentFile, QString torrentPath, QStrin
         for (i = i + 1; torrentFile[i] != '&'; i++)
             url += torrentFile[i];
 
-        url = QUrl::fromEncoded(url.toLocal8Bit()).toString().replace('+', ' ');
+        url = url.replace("%3A", "MyNameIsVladislavTyulbashev");
+        QUrl name = QUrl::fromEncoded(url.toLocal8Bit());
+        qDebug() << "Magnet link is valid:" << name.isValid();
+        if (!name.isValid())
+            qDebug() << name.errorString();
+        url = name.toDisplayString().replace('+', ' ').replace("MyNameIsVladislavTyulbashev", ":");
 
         p.save_path = (torrentPath + url + "/").toStdString();
 
