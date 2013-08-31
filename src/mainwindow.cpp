@@ -178,7 +178,7 @@ void MainWindow::realAddTorrent(QString torrentFile, QString torrentPath, QStrin
         qDebug() << "Magnet link is valid:" << name.isValid();
         if (!name.isValid())
             qDebug() << name.errorString();
-        url = name.toDisplayString().replace('+', ' ').replace("MyNameIsVladislavTyulbashev", ":");
+        url = name.toString().replace('+', ' ').replace("MyNameIsVladislavTyulbashev", ":");
 
         p.save_path = (torrentPath + url + "/").toStdString();
 
