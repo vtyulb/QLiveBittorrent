@@ -106,7 +106,7 @@ void SeedManager::updateInform() {
     erase();
     std::vector<libtorrent::torrent_handle> v = session->get_torrents();
 
-    printw("%s\n", ("/ №|" + setStringSize("Name", 20) + "|Upload speed(KB/s)|Uploaded(MB)|Size(MB)|" +
+    printw("%s\n", ("/ #|" + setStringSize("Name", 20) + "|Upload speed(KB/s)|Uploaded(MB)|Size(MB)|" +
                    setStringSize("state", 11) + "\\").toLocal8Bit().constData());
     for (int i = firstDisplayingTorrent; i < firstDisplayingTorrent + numberDisplayingTorrents(); i++) {
         printw("|%s|%s|%s|%s|%s|",
