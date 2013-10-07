@@ -22,4 +22,4 @@ http://habrahabr.ru/post/185770/
 Plus and Minus keys - to increase/decrease download rate limit.
 'a' - to switch agressive/non-agressive piece picking;
 
-GPL License
+GPLv2+ license (see COPYING for details)
