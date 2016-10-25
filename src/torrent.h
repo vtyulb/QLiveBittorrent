@@ -13,7 +13,9 @@
 #include <libtorrent/torrent_handle.hpp>
 #include <libtorrent/ip_filter.hpp>
 #include <libtorrent/peer_info.hpp>
+#include <libtorrent/torrent_info.hpp>
 
+//#include <boost/asio/impl/src.hpp>
 
 #include <curses.h>
 #include <constants.h>

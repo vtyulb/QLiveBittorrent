@@ -16,7 +16,7 @@ Just use AUR package: https://aur.archlinux.org/packages/qlivebittorrent-git
 
 ### Ubuntu 16.10+ && Debian testing
 Use packages provided by [DAP-DarkneSS](https://github.com/DAP-DarkneSS)  
-Or make project manually:
+Or build project manually:
 ```
 apt-get install ncurses-dev libtorrent-rasterbar-dev g++ make qt5-default libboost-system-dev libboost-program-options-dev
 gcc -g driver.c `pkg-config fuse --cflags --libs` -o qlivebittorrent-driver

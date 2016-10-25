@@ -6,8 +6,10 @@
 #include <QWidget>
 #include <QPaintEvent>
 #include <QPainter>
+
 #include <libtorrent/bitfield.hpp>
 #include <libtorrent/torrent_handle.hpp>
+#include <libtorrent/torrent_status.hpp>
 
 using libtorrent::bitfield;
 using libtorrent::partial_piece_info;

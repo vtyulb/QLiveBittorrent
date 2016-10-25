@@ -5,8 +5,11 @@ SeedManager::SeedManager(QString rate, QObject *parent) :
 {
     informationFlushed = false;
     firstDisplayingTorrent = 0;
+
+    libtorrent::error_code thereAreNoErrorsOnEarth;
+
     session = new libtorrent::session;
-    session->listen_on(std::make_pair(6881, 6889));
+    session->listen_on(std::make_pair(6881, 6889), thereAreNoErrorsOnEarth);
     session->set_alert_mask(0);
     session->set_upload_rate_limit(rate.toInt() * 1000);
     findTorrents();
@@ -91,8 +94,14 @@ void SeedManager::addTorrent(QString torrent) {
     QByteArray data = s.value("data").toByteArray();
     libtorrent::entry e = libtorrent::bdecode(data.begin(), data.end());
     libtorrent::torrent_info *inf = new libtorrent::torrent_info(e);
+
+    add_torrent_params p;
+    p.storage_mode = libtorrent::storage_mode_allocate;
+    p.ti = boost::make_shared<libtorrent::torrent_info>(*inf);
+    p.save_path = (s.value("path").toString()).toStdString();
+
     const libtorrent::torrent_handle h =
-            session->add_torrent(inf, s.value("path").toString().toStdString(), e);
+            session->add_torrent(p);
 
     h.set_upload_mode(true);
     h.auto_managed(false);

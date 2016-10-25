@@ -1,5 +1,7 @@
 #include "torrent.h"
 
+#include <boost/asio/error.hpp>
+
 Torrent::Torrent(const QString &path, const QString &mount, torrent_handle handle, QObject *parent) :
     QObject(parent)
 {
@@ -15,7 +17,7 @@ Torrent::Torrent(const QString &path, const QString &mount, torrent_handle handl
     name = QString::fromStdString(handle.name());
     torrent_info inform = handle.get_torrent_info();
     int cnt = 0;
-    for (file_iterator i = inform.begin_files(); i != inform.end_files(); i++, cnt++)
+    for (auto i = inform.begin_files(); i != inform.end_files(); i++, cnt++)
         m["/" + QString::fromStdString(inform.files().at(i).path)] = cnt;
 
     umountList << "-u" << "-q" << "-o" << "hard_remove" << mount;

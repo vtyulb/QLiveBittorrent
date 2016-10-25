@@ -7,6 +7,7 @@
 #include <QDir>
 #include <constants.h>
 
+
 namespace Ui {
 class TorrentDialog;
 }

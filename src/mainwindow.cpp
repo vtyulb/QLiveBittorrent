@@ -187,7 +187,7 @@ void MainWindow::realAddTorrent(QString torrentFile, QString torrentPath, QStrin
         mapTorrent[main->torrent->name()] = main;
     } else {
         torrent_info *inf = new libtorrent::torrent_info(torrentFile.toStdString());
-        p.ti = inf;
+        p.ti = boost::make_shared<libtorrent::torrent_info>(*inf);
         p.save_path = (torrentPath + QString::fromStdString(inf->name()) + "/").toStdString();
         main = new Torrent(torrentPath + QString::fromStdString(inf->name()), mountPath + QString::fromStdString(inf->name()), session->add_torrent(p), this);
         mapTorrent[main->torrent->name()] = main;
@@ -336,8 +336,16 @@ void MainWindow::addTorrentByName(QString torrent) {
     QByteArray data = s.value("data").toByteArray();
     libtorrent::entry e = libtorrent::bdecode(data.begin(), data.end());
     libtorrent::torrent_info *inf = new libtorrent::torrent_info(e);
+
+
+    add_torrent_params p;
+    p.storage_mode = libtorrent::storage_mode_allocate;
+    p.ti = boost::make_shared<libtorrent::torrent_info>(*inf);
+    p.save_path = (s.value("path").toString()).toStdString();
+
+
     const libtorrent::torrent_handle h =
-            session->add_torrent(inf, (s.value("path").toString()).toStdString(), e);
+            session->add_torrent(p);
 
     h.set_upload_mode(true);
     h.auto_managed(false);

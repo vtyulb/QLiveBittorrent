@@ -37,6 +37,8 @@
 #include "libtorrent/alert_types.hpp"
 #include "libtorrent/magnet_uri.hpp"
 #include "boost/filesystem/operations.hpp"
+#include "boost/asio/error.hpp"
+//#include "boost/asio/impl/src.hpp"
 #include "curses.h"
 
 using libtorrent::torrent_info;
