@@ -11,10 +11,10 @@ cp qlivebittorrent /usr/bin/ && cp qlivebittorrent-driver /usr/bin/
 qlivebittorrent --help
 ```
 
-##### ArchLinux
+### ArchLinux
 Just use AUR package: https://aur.archlinux.org/packages/qlivebittorrent-git
 
-##### Ubuntu 16.10+ && Debian testing
+### Ubuntu 16.10+ && Debian testing
 Use packages provided by [DAP-DarkneSS](https://github.com/DAP-DarkneSS)  
 Or make project manually:
 ```
@@ -24,8 +24,7 @@ qmake -makefile && make
 cp qlivebittorrent /usr/bin/ && cp qlivebittorrent-driver /usr/bin/
 ```
 
-
-##### Other information
+### Other information
 qlivebittorrent try to find qlivebittorrent-driver in the working directory.
 In non-Portable version (define PORTABLE in qlivebittorrent.pro) it would try
 to find it in PATH
