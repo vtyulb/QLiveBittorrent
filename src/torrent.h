@@ -14,6 +14,7 @@
 #include <libtorrent/ip_filter.hpp>
 #include <libtorrent/peer_info.hpp>
 
+
 #include <curses.h>
 #include <constants.h>
 
@@ -23,7 +24,6 @@ using libtorrent::torrent_handle;
 using libtorrent::peer_request;
 using libtorrent::partial_piece_info;
 using std::min;
-typedef file_storage::iterator file_iterator;
 
 class Torrent : public QObject
 {
