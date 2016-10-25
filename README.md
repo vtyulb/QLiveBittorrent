@@ -3,7 +3,7 @@ QLiveBittorrent
 
 Bittorrent client with function reading files before they would be downloaded
 
-You'll need libtorrent, ncurses, boost-system, boost-program-options and qt5.
+You'll need libtorrent, ncurses, boost-system, boost-program-options, fuse and qt5.
 ```
 gcc -g driver.c `pkg-config fuse --cflags --libs` -o qlivebittorrent-driver
 qmake -makefile && make
@@ -18,7 +18,7 @@ Just use AUR package: https://aur.archlinux.org/packages/qlivebittorrent-git
 Use packages provided by [DAP-DarkneSS](https://github.com/DAP-DarkneSS)  
 Or build project manually:
 ```
-apt-get install ncurses-dev libtorrent-rasterbar-dev g++ make qt5-default libboost-system-dev libboost-program-options-dev
+apt-get install ncurses-dev libtorrent-rasterbar-dev g++ make qt5-default libboost-system-dev libboost-program-options-dev libfuse-dev  
 gcc -g driver.c `pkg-config fuse --cflags --libs` -o qlivebittorrent-driver
 qmake -makefile && make
 cp qlivebittorrent /usr/bin/ && cp qlivebittorrent-driver /usr/bin/
