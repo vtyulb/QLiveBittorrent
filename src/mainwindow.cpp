@@ -119,7 +119,7 @@ void MainWindow::updateStandartText() {
 
     QString text;
     text += QString("Mount status: ");
-    if (main->mountStatus())
+    if (main && main->mountStatus())
         text += "mounted\n";
     else
         text += "error ('r' to remount)\n";
